@@ -1,0 +1,176 @@
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import Icon from 'components/AppIcon';
+
+const UpcomingDeadlines = () => {
+  const navigate = useNavigate();
+
+  const deadlines = [
+    {
+      id: 1,
+      title: "React Quiz",
+      course: "Advanced React Development",
+      dueDate: "2024-01-15",
+      dueTime: "11:59 PM",
+      priority: "high",
+      type: "quiz",
+      progress: 0
+    },
+    {
+      id: 2,
+      title: "ML Assignment",
+      course: "Machine Learning Fundamentals",
+      dueDate: "2024-01-18",
+      dueTime: "5:00 PM",
+      priority: "medium",
+      type: "assignment",
+      progress: 45
+    },
+    {
+      id: 3,
+      title: "Design Project",
+      course: "UI/UX Design Principles",
+      dueDate: "2024-01-22",
+      dueTime: "2:00 PM",
+      priority: "low",
+      type: "project",
+      progress: 80
+    }
+  ];
+
+  const getDaysUntilDue = (dueDate) => {
+    const today = new Date();
+    const due = new Date(dueDate);
+    const diffTime = due - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return "Due today";
+    if (diffDays === 1) return "Due tomorrow";
+    if (diffDays < 0) return "Overdue";
+    return `${diffDays} days left`;
+  };
+
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case 'high':
+        return 'text-error bg-error-100';
+      case 'medium':
+        return 'text-warning bg-warning-100';
+      case 'low':
+        return 'text-success bg-success-100';
+      default:
+        return 'text-text-secondary bg-gray-100';
+    }
+  };
+
+  const getTypeIcon = (type) => {
+    switch (type) {
+      case 'quiz':
+        return 'HelpCircle';
+      case 'assignment':
+        return 'FileText';
+      case 'project':
+        return 'Folder';
+      default:
+        return 'Calendar';
+    }
+  };
+
+  const handleDeadlineClick = (deadline) => {
+    // Navigate to specific course or assignment
+    navigate('/course-library');
+  };
+
+  return (
+    <div className="bg-surface rounded-lg border border-border p-4">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="font-heading font-semibold text-text-primary">
+          Upcoming Deadlines
+        </h3>
+        <button 
+          onClick={() => navigate('/course-library')}
+          className="text-primary hover:text-primary-700 text-sm font-medium transition-colors duration-150"
+        >
+          View All
+        </button>
+      </div>
+
+      <div className="space-y-3">
+        {deadlines.map((deadline) => (
+          <div 
+            key={deadline.id}
+            onClick={() => handleDeadlineClick(deadline)}
+            className="p-3 border border-border rounded-lg hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
+          >
+            <div className="flex items-start justify-between mb-2">
+              <div className="flex items-center space-x-2">
+                <Icon 
+                  name={getTypeIcon(deadline.type)} 
+                  size={16} 
+                  className="text-text-secondary" 
+                />
+                <h4 className="font-medium text-text-primary text-sm">
+                  {deadline.title}
+                </h4>
+              </div>
+              <span className={`text-xs px-2 py-1 rounded-full ${getPriorityColor(deadline.priority)}`}>
+                {deadline.priority}
+              </span>
+            </div>
+
+            <p className="text-xs text-text-secondary mb-2">
+              {deadline.course}
+            </p>
+
+            <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center space-x-1">
+                <Icon name="Clock" size={12} className="text-text-tertiary" />
+                <span className="text-text-tertiary">
+                  {getDaysUntilDue(deadline.dueDate)}
+                </span>
+              </div>
+              
+              {deadline.progress > 0 && (
+                <div className="flex items-center space-x-2">
+                  <div className="w-12 bg-gray-200 rounded-full h-1">
+                    <div 
+                      className="bg-primary h-1 rounded-full"
+                      style={{ width: `${deadline.progress}%` }}
+                    ></div>
+                  </div>
+                  <span className="text-text-tertiary">
+                    {deadline.progress}%
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {deadlines.length === 0 && (
+        <div className="text-center py-6">
+          <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <Icon name="Calendar" size={20} className="text-text-tertiary" />
+          </div>
+          <p className="text-sm text-text-secondary">
+            No upcoming deadlines
+          </p>
+        </div>
+      )}
+
+      {/* Quick add reminder */}
+      <button
+        onClick={() => console.log('Add reminder')}
+        className="w-full mt-4 p-2 border-2 border-dashed border-border rounded-lg text-text-secondary hover:border-primary hover:text-primary transition-colors duration-150 text-sm"
+      >
+        <div className="flex items-center justify-center space-x-2">
+          <Icon name="Plus" size={16} />
+          <span>Add Reminder</span>
+        </div>
+      </button>
+    </div>
+  );
+};
+
+export default UpcomingDeadlines;

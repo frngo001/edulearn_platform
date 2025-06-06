@@ -1,0 +1,201 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Primary Colors */
+    --color-primary: #4F46E5; /* Indigo that conveys trust and intelligence - indigo-600 */
+    --color-primary-50: #EEF2FF; /* Light indigo background - indigo-50 */
+    --color-primary-100: #E0E7FF; /* Very light indigo - indigo-100 */
+    --color-primary-500: #6366F1; /* Medium indigo - indigo-500 */
+    --color-primary-700: #3730A3; /* Dark indigo - indigo-700 */
+    --color-primary-900: #312E81; /* Very dark indigo - indigo-900 */
+
+    /* Secondary Colors */
+    --color-secondary: #06B6D4; /* Cyan that suggests clarity and fresh thinking - cyan-500 */
+    --color-secondary-50: #ECFEFF; /* Light cyan background - cyan-50 */
+    --color-secondary-100: #CFFAFE; /* Very light cyan - cyan-100 */
+    --color-secondary-500: #06B6D4; /* Medium cyan - cyan-500 */
+    --color-secondary-700: #0E7490; /* Dark cyan - cyan-700 */
+    --color-secondary-900: #164E63; /* Very dark cyan - cyan-900 */
+
+    /* Accent Colors */
+    --color-accent: #F59E0B; /* Warm amber for achievement and progress - amber-500 */
+    --color-accent-50: #FFFBEB; /* Light amber background - amber-50 */
+    --color-accent-100: #FEF3C7; /* Very light amber - amber-100 */
+    --color-accent-500: #F59E0B; /* Medium amber - amber-500 */
+    --color-accent-700: #D97706; /* Dark amber - amber-700 */
+    --color-accent-900: #92400E; /* Very dark amber - amber-900 */
+
+    /* Background Colors */
+    --color-background: #FAFAFA; /* Soft off-white for reduced eye strain - gray-50 */
+    --color-surface: #FFFFFF; /* Pure white for content cards and modals - white */
+    --color-surface-secondary: #F9FAFB; /* Light gray surface - gray-50 */
+
+    /* Text Colors */
+    --color-text-primary: #1F2937; /* Dark gray for excellent readability - gray-800 */
+    --color-text-secondary: #6B7280; /* Medium gray for supporting text - gray-500 */
+    --color-text-tertiary: #9CA3AF; /* Light gray for subtle text - gray-400 */
+    --color-text-inverse: #FFFFFF; /* White text for dark backgrounds - white */
+
+    /* Status Colors */
+    --color-success: #10B981; /* Fresh green for achievements - emerald-500 */
+    --color-success-50: #ECFDF5; /* Light green background - emerald-50 */
+    --color-success-100: #D1FAE5; /* Very light green - emerald-100 */
+    --color-success-700: #047857; /* Dark green - emerald-700 */
+
+    --color-warning: #F59E0B; /* Consistent with accent for attention - amber-500 */
+    --color-warning-50: #FFFBEB; /* Light warning background - amber-50 */
+    --color-warning-100: #FEF3C7; /* Very light warning - amber-100 */
+    --color-warning-700: #D97706; /* Dark warning - amber-700 */
+
+    --color-error: #EF4444; /* Clear red for problems without being aggressive - red-500 */
+    --color-error-50: #FEF2F2; /* Light error background - red-50 */
+    --color-error-100: #FEE2E2; /* Very light error - red-100 */
+    --color-error-700: #DC2626; /* Dark error - red-700 */
+
+    /* Border Colors */
+    --color-border: #E5E7EB; /* Light gray for minimal borders - gray-200 */
+    --color-border-secondary: #F3F4F6; /* Very light gray for subtle separation - gray-100 */
+    --color-border-focus: #4F46E5; /* Primary color for focus states - indigo-600 */
+
+    /* Shadow Colors */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-text-primary font-body;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+
+  /* Reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Custom component styles */
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+    @apply px-4 py-2 rounded-md font-medium transition-all duration-200;
+    @apply transform hover:scale-102 active:scale-98;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-white hover:bg-secondary-700 focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2;
+    @apply px-4 py-2 rounded-md font-medium transition-all duration-200;
+    @apply transform hover:scale-102 active:scale-98;
+  }
+
+  .card {
+    @apply bg-surface rounded-lg shadow-base border border-border;
+    @apply transition-shadow duration-200 hover:shadow-md;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 border border-border rounded-md;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary;
+    @apply transition-colors duration-200;
+  }
+
+  .floating-action {
+    @apply fixed bottom-6 right-6 bg-primary text-white rounded-full p-4;
+    @apply shadow-lg hover:shadow-xl transform hover:scale-105;
+    @apply transition-all duration-200 z-50;
+    animation: gentle-pulse 2s infinite;
+  }
+
+  @keyframes gentle-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  .skeleton {
+    @apply bg-gray-200 animate-pulse rounded;
+  }
+
+  .tooltip {
+    @apply absolute z-50 px-2 py-1 text-sm text-white bg-gray-900 rounded;
+    @apply opacity-0 pointer-events-none transition-opacity duration-150;
+  }
+
+  .tooltip.show {
+    @apply opacity-100 pointer-events-auto;
+  }
+
+  /* Navigation specific styles */
+  .nav-item {
+    @apply flex items-center px-3 py-2 rounded-md text-sm font-medium;
+    @apply transition-colors duration-150 ease-in-out;
+  }
+
+  .nav-item.active {
+    @apply bg-primary-100 text-primary-700;
+  }
+
+  .nav-item:hover:not(.active) {
+    @apply bg-gray-100 text-gray-900;
+  }
+
+  /* Study session styles */
+  .study-overlay {
+    @apply fixed inset-0 bg-black bg-opacity-50 z-40;
+    @apply transition-opacity duration-300;
+  }
+
+  .study-controls {
+    @apply fixed bottom-4 left-1/2 transform -translate-x-1/2;
+    @apply bg-white rounded-full shadow-lg px-6 py-3 z-50;
+    @apply flex items-center space-x-4;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .scale-102 {
+    transform: scale(1.02);
+  }
+
+  .scale-98 {
+    transform: scale(0.98);
+  }
+
+  .animation-delay-150 {
+    animation-delay: 150ms;
+  }
+
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+
+  .animation-delay-450 {
+    animation-delay: 450ms;
+  }
+}
