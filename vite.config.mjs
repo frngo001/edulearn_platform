@@ -9,7 +9,21 @@ export default defineConfig({
   // comment this out if that isn't relevant for your project
   build: {
     outDir: "build",
-    chunkSizeWarningLimit: 2000,
+    chunkSizeWarningLimit: 5000, // Erhöht von 2000 auf 5000 kB
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // React und React-DOM in separaten Chunk
+          'react-vendor': ['react', 'react-dom'],
+          // Routing Libraries
+          'router': ['react-router-dom'],
+          // UI Libraries (falls verwendet)
+          'ui-vendor': [],
+          // Supabase in separaten Chunk (falls groß)
+          'supabase': ['@supabase/supabase-js']
+        }
+      }
+    }
   },
   plugins: [tsconfigPaths(), react(), tagger()],
   server: {
