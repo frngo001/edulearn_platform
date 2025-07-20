@@ -1,0 +1,203 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# EduLearn Platform - Cursor AI Rules
+
+## Project Overview
+This is an educational platform built with React 18, Vite, Redux Toolkit, and Tailwind CSS. The platform focuses on learning management with AI assistance, course libraries, and dashboard functionality.
+
+## 🏗️ Architecture & File Structure
+
+### Strict Directory Structure
+```
+src/
+├── components/          # Reusable UI components
+│   ├── ui/             # Base UI components (buttons, inputs, etc.)
+│   └── [ComponentName].jsx
+├── pages/              # Page components (each in own folder)
+│   ├── [page-name]/    # Kebab-case folder names
+│   │   ├── index.jsx   # Main page component
+│   │   └── components/ # Page-specific components
+├── lib/                # Utilities and configurations
+├── styles/             # Global styles and Tailwind utilities
+├── App.jsx             # Main application component
+├── Routes.jsx          # Application routing
+└── index.jsx           # Entry point
+```
+
+## 🎯 Code Generation Rules
+
+### 1. Component Creation Standards
+- **Always use functional components with hooks**
+- **Use PascalCase for component names**
+- **Place each page in its own folder under `src/pages/[page-name]/`**
+- **Use kebab-case for page folder names**
+- **Create `index.jsx` as the main component in page folders**
+- **Place page-specific components in `[page-name]/components/`**
+
+### 2. Import Organization
+```jsx
+// React and hooks (first)
+import React, { useState, useEffect } from 'react';
+
+// Third-party libraries
+import { motion } from 'framer-motion';
+import axios from 'axios';
+
+// Redux (if used)
+import { useSelector, useDispatch } from 'react-redux';
+
+// Internal components (absolute paths)
+import Button from 'components/ui/Button';
+import AppImage from 'components/AppImage';
+// Page-specific components (relative paths)
+import './ComponentName.css'; // Only if custom CSS needed
+```
+
+### 3. Styling Guidelines
+- **Primary**: Use Tailwind CSS classes exclusively
+- **Colors**: Use the custom color palette defined in tailwind.config.js
+  - Primary: `primary`, `primary-50`, `primary-100`, etc.
+  - Secondary: `secondary`, `secondary-50`, etc.
+  - Background: `background`, `surface`, `surface-secondary`
+  - Text: `text-primary`, `text-secondary`, `text-tertiary`
+- **Animations**: Use defined custom animations: `animate-fade-in`, `animate-slide-up`, etc.
+- **Spacing**: Use consistent spacing scale with custom values (18, 72, 84, 96)
+
+### 4. Component Structure Template
+```jsx
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+
+const ComponentName = ({ prop1, prop2, ...otherProps }) => {
+  // State declarations
+  const [state, setState] = useState(initialValue);
+  
+  // Effects
+  useEffect(() => {
+    // Effect logic
+  }, [dependencies]);
+  
+  // Event handlers
+  const handleEvent = () => {
+    // Handler logic
+  };
+  
+  // Render
+  return (
+    <motion.div
+      className="container-class"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      {...otherProps}
+    >
+      {/* Component JSX */}
+    </motion.div>
+  );
+};
+
+export default ComponentName;
+```
+
+### 5. Routing Rules
+- **Always update `src/Routes.jsx` when adding new pages**
+- **Use kebab-case for route paths**
+- **Import pages at the top of Routes.jsx**
+- **Include ErrorBoundary wrapper for all routes**
+
+### 6. State Management
+- **Use Redux Toolkit for global state**
+- **Use local useState for component-specific state**
+- **Use useEffect for side effects and API calls**
+- **Prefer custom hooks for complex logic reuse**
+
+### 7. API Integration
+- **Use axios for HTTP requests**
+- **Create API functions in `src/lib/api.js`**
+- **Handle loading and error states**
+- **Use async/await pattern**
+
+### 8. Form Handling
+- **Use React Hook Form for form management**
+- **Apply consistent validation patterns**
+- **Use Tailwind form styles from `@tailwindcss/forms`**
+
+### 9. Accessibility Standards
+- **Include proper ARIA labels**
+- **Use semantic HTML elements**
+- **Ensure keyboard navigation support**
+- **Maintain proper contrast ratios**
+
+### 10. Performance Optimization
+- **Use React.memo for components that receive stable props**
+- **Implement lazy loading for routes**
+- **Optimize images with AppImage component**
+- **Use proper key props in lists**
+
+## 🚫 Restrictions & Conventions
+
+### Never Do:
+- Create components outside the established folder structure
+- Use inline styles instead of Tailwind classes
+- Create new CSS files unless absolutely necessary
+- Use class components (always use functional components)
+- Ignore the custom color palette
+- Create pages without updating Routes.jsx
+- Use hardcoded colors instead of theme colors
+
+### Always Do:
+- Follow the exact import order specified
+- Use the custom Tailwind animations and transitions
+- Include proper PropTypes or TypeScript types
+- Add loading and error states for async operations
+- Use the established naming conventions
+- Include proper error boundaries
+- Follow the responsive design patterns
+- Use the custom font families defined in config
+
+## 🎨 UI/UX Guidelines
+
+### Design System
+- **Card Components**: Use `bg-surface` with `shadow-elevation-1`
+- **Buttons**: Primary (`bg-primary`), Secondary (`bg-secondary`), Accent (`bg-accent`)
+- **Text Hierarchy**: `text-primary` for headings, `text-secondary` for body
+- **Spacing**: Use 4, 6, 8, 12, 16, 24, 32 for consistent spacing
+- **Border Radius**: Use `rounded-card` for cards, `rounded-lg` for buttons
+
+### Animation Patterns
+- **Page Transitions**: Use `animate-fade-in` with `duration-300`
+- **Hover Effects**: Use `scale-102` and smooth transitions
+- **Loading States**: Use `animate-gentle-pulse`
+
+## 📱 Responsive Design
+- **Mobile First**: Start with mobile design, then scale up
+- **Breakpoints**: sm (640px), md (768px), lg (1024px), xl (1280px)
+- **Typography**: Use fluid typography classes
+- **Layout**: Use CSS Grid and Flexbox through Tailwind
+
+## 🧪 Testing Considerations
+- **Write testable components**: Separate logic from presentation
+- **Use data-testid for testing selectors**
+- **Mock external dependencies in tests**
+
+## 📋 Code Quality
+- **Use meaningful variable and function names**
+- **Keep functions small and focused**
+- **Add comments for complex logic**
+- **Use destructuring for props and state**
+- **Prefer const over let when possible**
+
+## 🔄 When Modifying Existing Code
+- **Maintain the existing code structure and patterns**
+- **Preserve custom Tailwind classes and color scheme**
+- **Keep the same import organization**
+- **Maintain consistency with existing component patterns**
+- **Update Routes.jsx if adding new pages**
+
+Remember: The goal is to maintain consistency with the existing EduLearn Platform codebase while ensuring scalability and maintainability. 
+
+
+

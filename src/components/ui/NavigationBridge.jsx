@@ -19,8 +19,9 @@ const NavigationBridge = () => {
       setTimeout(() => setIsTransitioning(false), 300);
     }
 
-    // Show quick return button when in study mode
-    setShowQuickReturn(studyPaths.includes(location.pathname));
+    // Don't show quick return button for flashcard-study-interface and ai-chat-assistant
+    const shouldShowQuickReturn = false; // Disabled for all study sessions
+    setShowQuickReturn(shouldShowQuickReturn);
 
     setPreviousPath(location.pathname);
   }, [location.pathname, previousPath]);
@@ -76,7 +77,7 @@ const NavigationBridge = () => {
     );
   }
 
-  // Quick return button for study sessions
+  // Quick return button for study sessions (excluding flashcard-study-interface)
   if (showQuickReturn && studyContext) {
     return (
       <div className="fixed top-4 left-4 z-90">

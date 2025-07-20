@@ -1,0 +1,275 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# EduLearn Platform - Mobile-Only Design Rules
+
+## Mobile-First Exclusive Development
+When this rule is active, **ONLY design and develop for mobile devices**. Ignore desktop breakpoints and focus exclusively on mobile user experience.
+
+## 📱 Mobile-Only Specifications
+
+### Screen Size Constraints
+- **Primary Target**: 375px - 414px (iPhone SE to iPhone Pro Max)
+- **Secondary Target**: 320px - 375px (smaller devices)
+- **Maximum Width**: 480px (anything beyond is not considered)
+- **Never use breakpoints**: `sm:`, `md:`, `lg:`, `xl:`, `2xl:`
+
+### Mobile-Specific Tailwind Classes
+```css
+/* Use ONLY these responsive patterns */
+- Default classes (no prefix) = mobile
+- max-w-sm, max-w-xs for containers
+- text-sm, text-xs for mobile typography
+- p-4, p-3, p-2 for mobile spacing
+- space-y-3, space-y-2, space-x-2 for mobile layouts
+```
+
+## 🎯 Mobile UI/UX Guidelines
+
+### Touch Interaction Standards
+- **Minimum Touch Target**: 44px x 44px (p-3 + w-10 h-10)
+- **Button Spacing**: Minimum 8px between touch targets (space-y-2)
+- **Swipe Gestures**: Always consider swipe navigation
+- **Tap Feedback**: Use `active:scale-95` for immediate feedback
+
+### Mobile Navigation Patterns
+- **Bottom Tab Navigation**: Primary navigation method
+- **Hamburger Menu**: Secondary navigation (sidebar)
+- **Swipe Navigation**: For content browsing
+- **Pull-to-Refresh**: For content updates
+
+### Mobile Typography Scale
+```css
+- text-2xl: Main page titles
+- text-xl: Section headers
+- text-lg: Subsection headers  
+- text-base: Body text
+- text-sm: Secondary text
+- text-xs: Labels and metadata
+```
+
+### Mobile Spacing System
+```css
+- p-6: Page padding
+- p-4: Card padding
+- p-3: Button padding
+- p-2: Icon padding
+- space-y-4: Section spacing
+- space-y-3: Item spacing
+- space-y-2: Dense lists
+```
+
+### Mobile Color Hierarchy
+- **High Contrast**: Essential for small screens
+- **Primary Actions**: bg-blue-600, text-white
+- **Secondary Actions**: bg-gray-100, text-gray-900
+- **Danger Actions**: bg-red-600, text-white
+- **Success States**: bg-green-600, text-white
+
+## 🚀 Mobile Component Patterns
+
+### Mobile Card Design
+```jsx
+<div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+  <div className="flex items-center space-x-3 mb-3">
+    <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+      <Icon name="Icon" size={20} className="text-blue-600" />
+    </div>
+    <div className="flex-1 min-w-0">
+      <h3 className="font-semibold text-gray-900 truncate">Title</h3>
+      <p className="text-sm text-gray-500 truncate">Subtitle</p>
+    </div>
+  </div>
+  <p className="text-sm text-gray-600 mb-4">Content</p>
+  <button className="w-full bg-blue-600 text-white p-3 rounded-xl font-medium">
+    Action
+  </button>
+</div>
+```
+
+### Mobile Input Design
+```jsx
+<div className="space-y-2">
+  <label className="block text-sm font-medium text-gray-900">
+    Label
+  </label>
+  <input 
+    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+    placeholder="Placeholder text"
+  />
+</div>
+```
+
+### Mobile List Items
+```jsx
+<div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 active:scale-95 transition-transform">
+  <div className="flex items-center space-x-3">
+    <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
+      <Icon name="Icon" size={20} className="text-gray-600" />
+    </div>
+    <div className="flex-1 min-w-0">
+      <h4 className="font-medium text-gray-900 truncate">Item Title</h4>
+      <p className="text-sm text-gray-500 truncate">Item description</p>
+    </div>
+    <Icon name="ChevronRight" size={16} className="text-gray-400" />
+  </div>
+</div>
+```
+
+## 🎨 Mobile Layout Patterns
+
+### Mobile Page Structure
+```jsx
+<div className="min-h-screen bg-gray-50">
+  {/* Fixed Header */}
+  <header className="fixed top-0 left-0 right-0 bg-white z-50 h-16 border-b border-gray-200">
+    {/* Header content */}
+  </header>
+  
+  {/* Scrollable Content */}
+  <main className="pt-16 pb-20 px-4">
+    {/* Page content */}
+  </main>
+  
+  {/* Fixed Bottom Navigation */}
+  <nav className="fixed bottom-0 left-0 right-0 bg-white z-50 h-16 border-t border-gray-200">
+    {/* Bottom navigation */}
+  </nav>
+</div>
+```
+
+### Mobile Grid System
+```jsx
+{/* Single Column Layout */}
+<div className="space-y-4">
+  {items.map(item => (
+    <div key={item.id} className="...">
+      {/* Item content */}
+    </div>
+  ))}
+</div>
+
+{/* Two Column Grid (limited use) */}
+<div className="grid grid-cols-2 gap-3">
+  {/* Only for small items like icons or stats */}
+</div>
+```
+
+## 🔧 Mobile-Specific Rules
+
+### Component Creation
+- **Always assume mobile-first viewport**
+- **Test at 375px width only**
+- **Use iPhone SE (375x667) as baseline**
+- **Prioritize thumb-friendly interactions**
+- **Design for one-handed use**
+
+### Animation Guidelines
+```css
+- Micro-interactions: duration-150
+- Page transitions: duration-300
+- Loading states: animate-pulse
+- Touch feedback: active:scale-95
+- Slide animations: translate-x-full
+```
+
+### Performance Optimizations
+- **Lazy load images**: Use AppImage component
+- **Minimize bundle size**: Import only needed icons
+- **Optimize touch responses**: Use passive event listeners
+- **Reduce reflows**: Use transform instead of position changes
+
+### Mobile Content Strategy
+- **Scannable content**: Short paragraphs, bullet points
+- **Progressive disclosure**: Show details on tap
+- **Clear hierarchy**: Strong visual contrast
+- **Minimal text input**: Use dropdowns, toggles, selections
+
+## 🚫 Mobile-Only Restrictions
+
+### Never Use:
+- Desktop breakpoints (sm:, md:, lg:, xl:, 2xl:)
+- Fixed widths larger than screen width
+- Hover states as primary interactions
+- Small touch targets (<44px)
+- Complex multi-column layouts
+- Desktop-specific navigation patterns
+- Mouse-dependent interactions
+
+### Always Use:
+- Touch-friendly interactions
+- Mobile-optimized typography
+- Finger-friendly spacing
+- Portrait-oriented layouts
+- Bottom-accessible navigation
+- Large, clear buttons
+- Single-column content flow
+## 📊 Mobile Testing Checklist
+- [ ] Component works at 320px width
+- [ ] Component works at 375px width  
+- [ ] Component works at 414px width
+- [ ] Touch targets are minimum 44px
+- [ ] Text is readable without zoom
+- [ ] Navigation is thumb-accessible
+- [ ] Performance is smooth on mobile
+- [ ] Works in portrait orientation
+- [ ] No horizontal scrolling required
+
+## 🎯 Mobile Component Examples
+
+### Mobile Dashboard Card
+```jsx
+const MobileDashboardCard = ({ title, value, icon, trend }) => (
+  <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+    <div className="flex items-center justify-between mb-3">
+      <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+        <Icon name={icon} size={20} className="text-blue-600" />
+      </div>
+      {trend && (
+        <div className="flex items-center space-x-1">
+          <Icon name="TrendingUp" size={14} className="text-green-500" />
+          <span className="text-xs text-green-500">+{trend}%</span>
+        </div>
+      )}
+    </div>
+    <div>
+      <p className="text-2xl font-bold text-gray-900">{value}</p>
+      <p className="text-sm text-gray-500">{title}</p>
+    </div>
+  </div>
+);
+```
+
+### Mobile Action Sheet
+```jsx
+const MobileActionSheet = ({ isOpen, onClose, actions }) => (
+  <>
+    {isOpen && (
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={onClose} />
+    )}
+    <div className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl z-50 transform transition-transform duration-300 ${
+      isOpen ? 'translate-y-0' : 'translate-y-full'
+    }`}>
+      <div className="p-6">
+        <div className="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-6"></div>
+        <div className="space-y-3">
+          {actions.map((action, index) => (
+            <button
+              key={index}
+              onClick={action.onClick}
+              className="w-full flex items-center space-x-3 p-4 rounded-xl hover:bg-gray-50 transition-colors"
+            >
+              <Icon name={action.icon} size={20} className="text-gray-600" />
+              <span className="font-medium text-gray-900">{action.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  </>
+);
+```
+
+Remember: This rule set focuses EXCLUSIVELY on mobile experience. When active, completely ignore desktop considerations and optimize everything for mobile-first, touch-based interactions. 

@@ -4,6 +4,7 @@ module.exports = {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class', // Enable class-based dark mode
   theme: {
     extend: {
       colors: {
@@ -31,12 +32,12 @@ module.exports = {
         'accent-700': '#D97706', // Dark amber - amber-700
         'accent-900': '#92400E', // Very dark amber - amber-900
 
-        // Background Colors
+        // Background Colors (Light Mode)
         'background': '#FAFAFA', // Soft off-white for reduced eye strain - gray-50
         'surface': '#FFFFFF', // Pure white for content cards and modals - white
         'surface-secondary': '#F9FAFB', // Light gray surface - gray-50
 
-        // Text Colors
+        // Text Colors (Light Mode)
         'text-primary': '#1F2937', // Dark gray for excellent readability - gray-800
         'text-secondary': '#6B7280', // Medium gray for supporting text - gray-500
         'text-tertiary': '#9CA3AF', // Light gray for subtle text - gray-400
@@ -62,6 +63,18 @@ module.exports = {
         'border': '#E5E7EB', // Light gray for minimal borders - gray-200
         'border-secondary': '#F3F4F6', // Very light gray for subtle separation - gray-100
         'border-focus': '#4F46E5', // Primary color for focus states - indigo-600
+
+        // Dark Mode Colors
+        'dark': {
+          'background': '#0F172A', // Dark blue-gray for main background - slate-900
+          'surface': '#1E293B', // Darker blue-gray for cards - slate-800
+          'surface-secondary': '#334155', // Medium blue-gray for secondary surfaces - slate-700
+          'text-primary': '#F1F5F9', // Light gray for primary text - slate-100
+          'text-secondary': '#CBD5E1', // Medium gray for secondary text - slate-300
+          'text-tertiary': '#94A3B8', // Darker gray for tertiary text - slate-400
+          'border': '#334155', // Medium blue-gray for borders - slate-700
+          'border-secondary': '#475569', // Lighter blue-gray for secondary borders - slate-600
+        }
       },
       fontFamily: {
         'heading': ['Inter', 'sans-serif'], // Modern sans-serif for headings

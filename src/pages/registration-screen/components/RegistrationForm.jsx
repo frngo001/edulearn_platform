@@ -13,31 +13,31 @@ const RegistrationForm = ({ currentStep, formData, onStepComplete, onStepBack })
 
     if (currentStep === 1) {
       if (!stepData.fullName?.trim()) {
-        newErrors.fullName = 'Full name is required';
+        newErrors.fullName = 'Vollständiger Name ist erforderlich';
       }
       if (!stepData.email?.trim()) {
-        newErrors.email = 'Email is required';
+        newErrors.email = 'E-Mail-Adresse ist erforderlich';
       } else if (!/\S+@\S+\.\S+/.test(stepData.email)) {
-        newErrors.email = 'Please enter a valid email address';
+        newErrors.email = 'Bitte geben Sie eine gültige E-Mail-Adresse ein';
       }
       if (!stepData.password) {
-        newErrors.password = 'Password is required';
+        newErrors.password = 'Passwort ist erforderlich';
       } else if (stepData.password.length < 8) {
-        newErrors.password = 'Password must be at least 8 characters';
+        newErrors.password = 'Passwort muss mindestens 8 Zeichen lang sein';
       }
       if (stepData.password !== stepData.confirmPassword) {
-        newErrors.confirmPassword = 'Passwords do not match';
+        newErrors.confirmPassword = 'Passwörter stimmen nicht überein';
       }
     } else if (currentStep === 2) {
       if (!stepData.subjects?.length) {
-        newErrors.subjects = 'Please select at least one subject';
+        newErrors.subjects = 'Bitte wählen Sie mindestens ein Fach aus';
       }
       if (!stepData.experienceLevel) {
-        newErrors.experienceLevel = 'Please select your experience level';
+        newErrors.experienceLevel = 'Bitte wählen Sie Ihr Erfahrungslevel aus';
       }
     } else if (currentStep === 3) {
       if (!stepData.acceptTerms) {
-        newErrors.acceptTerms = 'You must accept the terms and conditions';
+        newErrors.acceptTerms = 'Sie müssen die Nutzungsbedingungen akzeptieren';
       }
     }
 

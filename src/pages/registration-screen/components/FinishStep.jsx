@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Icon from 'components/AppIcon';
 
 const FinishStep = ({ formData, errors, onSubmit, onBack, isLoading }) => {
+  const navigate = useNavigate();
   const [localData, setLocalData] = useState({
     acceptTerms: formData.acceptTerms || false,
     emailNotifications: formData.emailNotifications !== undefined ? formData.emailNotifications : true,
@@ -41,51 +43,51 @@ const FinishStep = ({ formData, errors, onSubmit, onBack, isLoading }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="text-center mb-6">
-        <h2 className="text-xl font-heading font-semibold text-text-primary mb-2">
+        <h2 className="text-xl font-heading font-semibold text-text-primary dark:text-dark-text-primary mb-2">
           Almost Done!
         </h2>
-        <p className="text-text-secondary font-body">
+        <p className="text-text-secondary dark:text-dark-text-secondary font-body">
           Review your information and complete your registration
         </p>
       </div>
 
       {/* Registration Summary */}
-      <div className="bg-gray-50 rounded-lg p-4 space-y-4">
-        <h3 className="font-medium text-text-primary mb-3">Registration Summary</h3>
+      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-4">
+        <h3 className="font-medium text-text-primary dark:text-dark-text-primary mb-3">Registration Summary</h3>
         
         <div className="space-y-3">
           <div className="flex items-start space-x-3">
-            <Icon name="User" size={16} className="text-text-tertiary mt-0.5" />
+            <Icon name="User" size={16} className="text-text-tertiary dark:text-dark-text-tertiary mt-0.5" />
             <div>
-              <div className="text-sm font-medium text-text-primary">{formData.fullName}</div>
-              <div className="text-xs text-text-secondary">{formData.email}</div>
+              <div className="text-sm font-medium text-text-primary dark:text-dark-text-primary">{formData.fullName}</div>
+              <div className="text-xs text-text-secondary dark:text-dark-text-secondary">{formData.email}</div>
             </div>
           </div>
 
           <div className="flex items-start space-x-3">
-            <Icon name="BookOpen" size={16} className="text-text-tertiary mt-0.5" />
+            <Icon name="BookOpen" size={16} className="text-text-tertiary dark:text-dark-text-tertiary mt-0.5" />
             <div>
-              <div className="text-sm font-medium text-text-primary">Interests</div>
-              <div className="text-xs text-text-secondary">
+              <div className="text-sm font-medium text-text-primary dark:text-dark-text-primary">Interests</div>
+              <div className="text-xs text-text-secondary dark:text-dark-text-secondary">
                 {getSelectedSubjects().join(', ')}
               </div>
             </div>
           </div>
 
           <div className="flex items-start space-x-3">
-            <Icon name="TrendingUp" size={16} className="text-text-tertiary mt-0.5" />
+            <Icon name="TrendingUp" size={16} className="text-text-tertiary dark:text-dark-text-tertiary mt-0.5" />
             <div>
-              <div className="text-sm font-medium text-text-primary">Experience Level</div>
-              <div className="text-xs text-text-secondary">{getExperienceLabel()}</div>
+              <div className="text-sm font-medium text-text-primary dark:text-dark-text-primary">Experience Level</div>
+              <div className="text-xs text-text-secondary dark:text-dark-text-secondary">{getExperienceLabel()}</div>
             </div>
           </div>
 
           {formData.learningGoals && (
             <div className="flex items-start space-x-3">
-              <Icon name="Target" size={16} className="text-text-tertiary mt-0.5" />
+              <Icon name="Target" size={16} className="text-text-tertiary dark:text-dark-text-tertiary mt-0.5" />
               <div>
-                <div className="text-sm font-medium text-text-primary">Learning Goals</div>
-                <div className="text-xs text-text-secondary line-clamp-2">
+                <div className="text-sm font-medium text-text-primary dark:text-dark-text-primary">Learning Goals</div>
+                <div className="text-xs text-text-secondary dark:text-dark-text-secondary line-clamp-2">
                   {formData.learningGoals}
                 </div>
               </div>
@@ -102,7 +104,8 @@ const FinishStep = ({ formData, errors, onSubmit, onBack, isLoading }) => {
             onClick={() => setLocalData(prev => ({ ...prev, acceptTerms: !prev.acceptTerms }))}
             className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors duration-200 ${
               localData.acceptTerms
-                ? 'bg-primary border-primary' :'border-gray-300 hover:border-primary'
+                ? 'bg-primary border-primary'
+                : 'border-gray-300 dark:border-gray-600 hover:border-primary'
             }`}
           >
             {localData.acceptTerms && (
@@ -110,13 +113,21 @@ const FinishStep = ({ formData, errors, onSubmit, onBack, isLoading }) => {
             )}
           </button>
           <div className="flex-1">
-            <label className="text-sm text-text-primary cursor-pointer">
+            <label className="text-sm text-text-primary dark:text-dark-text-primary cursor-pointer">
               I agree to the{' '}
-              <button type="button" className="text-primary hover:text-primary-700 underline">
+              <button 
+                type="button" 
+                onClick={() => navigate('/terms-of-service')}
+                className="text-primary hover:text-primary-700 underline"
+              >
                 Terms of Service
               </button>{' '}
               and{' '}
-              <button type="button" className="text-primary hover:text-primary-700 underline">
+              <button 
+                type="button" 
+                onClick={() => navigate('/privacy-policy')}
+                className="text-primary hover:text-primary-700 underline"
+              >
                 Privacy Policy
               </button>{' '}
               *
@@ -133,15 +144,15 @@ const FinishStep = ({ formData, errors, onSubmit, onBack, isLoading }) => {
 
       {/* Email Preferences */}
       <div className="space-y-4">
-        <h4 className="font-medium text-text-primary">Email Preferences</h4>
+        <h4 className="font-medium text-text-primary dark:text-dark-text-primary">Email Preferences</h4>
         
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <label className="text-sm font-medium text-text-primary">
+              <label className="text-sm font-medium text-text-primary dark:text-dark-text-primary">
                 Course notifications
               </label>
-              <p className="text-xs text-text-secondary">
+              <p className="text-xs text-text-secondary dark:text-dark-text-secondary">
                 Get notified about course updates, assignments, and deadlines
               </p>
             </div>
@@ -149,7 +160,7 @@ const FinishStep = ({ formData, errors, onSubmit, onBack, isLoading }) => {
               type="button"
               onClick={() => setLocalData(prev => ({ ...prev, emailNotifications: !prev.emailNotifications }))}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${
-                localData.emailNotifications ? 'bg-primary' : 'bg-gray-200'
+                localData.emailNotifications ? 'bg-primary' : 'bg-gray-200 dark:bg-gray-600'
               }`}
             >
               <span
@@ -162,10 +173,10 @@ const FinishStep = ({ formData, errors, onSubmit, onBack, isLoading }) => {
 
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <label className="text-sm font-medium text-text-primary">
+              <label className="text-sm font-medium text-text-primary dark:text-dark-text-primary">
                 Marketing emails
               </label>
-              <p className="text-xs text-text-secondary">
+              <p className="text-xs text-text-secondary dark:text-dark-text-secondary">
                 Receive updates about new courses, features, and special offers
               </p>
             </div>
@@ -173,7 +184,7 @@ const FinishStep = ({ formData, errors, onSubmit, onBack, isLoading }) => {
               type="button"
               onClick={() => setLocalData(prev => ({ ...prev, marketingEmails: !prev.marketingEmails }))}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${
-                localData.marketingEmails ? 'bg-primary' : 'bg-gray-200'
+                localData.marketingEmails ? 'bg-primary' : 'bg-gray-200 dark:bg-gray-600'
               }`}
             >
               <span
@@ -191,7 +202,7 @@ const FinishStep = ({ formData, errors, onSubmit, onBack, isLoading }) => {
         <button
           type="button"
           onClick={onBack}
-          className="flex-1 bg-surface border border-border text-text-primary py-3 px-6 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 font-medium flex items-center justify-center"
+          className="flex-1 bg-surface dark:bg-dark-surface border border-border dark:border-dark-border text-text-primary dark:text-dark-text-primary py-3 px-6 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 font-medium flex items-center justify-center"
         >
           <Icon name="ArrowLeft" size={20} className="mr-2" />
           Back

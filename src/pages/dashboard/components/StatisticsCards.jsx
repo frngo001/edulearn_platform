@@ -1,62 +1,124 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Icon from 'components/AppIcon';
 
-const StatisticsCards = ({ stats }) => {
-  const statisticsData = [
+const StatisticsCards = () => {
+  const [timeRange, setTimeRange] = useState('week');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const stats = {
+    week: {
+      studyTime: 285,
+      coursesCompleted: 3,
+      flashcardsMastered: 147,
+      streak: 12,
+      averageScore: 87,
+      totalSessions: 24
+    },
+    month: {
+      studyTime: 1240,
+      coursesCompleted: 8,
+      flashcardsMastered: 543,
+      streak: 12,
+      averageScore: 89,
+      totalSessions: 96
+    },
+    year: {
+      studyTime: 14850,
+      coursesCompleted: 45,
+      flashcardsMastered: 2847,
+      streak: 12,
+      averageScore: 91,
+      totalSessions: 1152
+    }
+  };
+
+  const currentStats = stats[timeRange];
+
+  const cards = [
     {
       id: 'study-time',
-      title: 'Weekly Study Time',
-      value: stats.studyTime,
-      unit: 'minutes',
+      title: 'Lernzeit',
+      value: `${currentStats.studyTime}min`,
       change: '+12%',
       changeType: 'positive',
       icon: 'Clock',
-      color: 'primary',
-      target: 300,
-      description: 'This week vs last week'
+      color: 'blue',
+      description: timeRange === 'week' ? 'Diese Woche' : timeRange === 'month' ? 'Diesen Monat' : 'Dieses Jahr'
     },
     {
-      id: 'courses-completed',
-      title: 'Courses Completed',
-      value: stats.coursesCompleted,
-      unit: 'courses',
-      change: '+1',
+      id: 'courses',
+      title: 'Abgeschlossene Kurse',
+      value: currentStats.coursesCompleted,
+      change: '+3',
       changeType: 'positive',
-      icon: 'Trophy',
-      color: 'accent',
-      target: 5,
-      description: 'This month'
+      icon: 'BookOpen',
+      color: 'green',
+      description: timeRange === 'week' ? 'Diese Woche' : timeRange === 'month' ? 'Diesen Monat' : 'Dieses Jahr'
     },
     {
-      id: 'flashcards-mastered',
-      title: 'Flashcards Mastered',
-      value: stats.flashcardsMastered,
-      unit: 'cards',
+      id: 'flashcards',
+      title: 'Gemeisterte Karten',
+      value: currentStats.flashcardsMastered,
       change: '+23',
       changeType: 'positive',
-      icon: 'CreditCard',
-      color: 'secondary',
-      target: 200,
-      description: 'This week'
+      icon: 'Brain',
+      color: 'purple',
+      description: timeRange === 'week' ? 'Diese Woche' : timeRange === 'month' ? 'Diesen Monat' : 'Dieses Jahr'
+    },
+    {
+      id: 'streak',
+      title: 'Lern-Serie',
+      value: `${currentStats.streak} Tage`,
+      change: '+2',
+      changeType: 'positive',
+      icon: 'Flame',
+      color: 'orange',
+      description: 'Aktuelle Serie'
+    },
+    {
+      id: 'average-score',
+      title: 'Durchschnittsscore',
+      value: `${currentStats.averageScore}%`,
+      change: '+5%',
+      changeType: 'positive',
+      icon: 'Target',
+      color: 'indigo',
+      description: timeRange === 'week' ? 'Diese Woche' : timeRange === 'month' ? 'Diesen Monat' : 'Dieses Jahr'
+    },
+    {
+      id: 'sessions',
+      title: 'Lernsitzungen',
+      value: currentStats.totalSessions,
+      change: '+8',
+      changeType: 'positive',
+      icon: 'Activity',
+      color: 'teal',
+      description: timeRange === 'week' ? 'Diese Woche' : timeRange === 'month' ? 'Diesen Monat' : 'Dieses Jahr'
     }
+  ];
+
+  const timeRangeOptions = [
+    { value: 'week', label: 'Diese Woche' },
+    { value: 'month', label: 'Diesen Monat' },
+    { value: 'year', label: 'Dieses Jahr' }
   ];
 
   const getColorClasses = (color) => {
     const colorMap = {
       primary: {
-        bg: 'bg-primary-100',
-        text: 'text-primary-700',
-        icon: 'text-primary-600'
+        bg: 'bg-primary',
+        text: 'text-primary-700 dark:text-primary-400',
+        icon: 'text-white'
       },
       secondary: {
-        bg: 'bg-secondary-100',
-        text: 'text-secondary-700',
-        icon: 'text-secondary-600'
+        bg: 'bg-secondary',
+        text: 'text-secondary-700 dark:text-secondary-400',
+        icon: 'text-white'
       },
       accent: {
-        bg: 'bg-accent-100',
-        text: 'text-accent-700',
-        icon: 'text-accent-600'
+        bg: 'bg-accent',
+        text: 'text-accent-700 dark:text-accent-400',
+        icon: 'text-white'
       }
     };
     return colorMap[color] || colorMap.primary;
@@ -72,51 +134,53 @@ const StatisticsCards = ({ stats }) => {
   };
 
   return (
-    <div className="bg-surface rounded-lg border border-border p-6">
-      <h2 className="text-xl font-heading font-semibold text-text-primary mb-6">
-        Your Statistics
+    <div className="bg-surface dark:bg-dark-surface rounded-lg border border-border dark:border-dark-border p-4 sm:p-6">
+      <h2 className="text-lg sm:text-xl font-heading font-semibold text-text-primary dark:text-dark-text-primary mb-4 sm:mb-6">
+        Deine Statistiken
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {statisticsData.map((stat) => {
-          const colors = getColorClasses(stat.color);
-          const progressPercentage = Math.min((stat.value / stat.target) * 100, 100);
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        {cards.map((card) => {
+          const colors = getColorClasses(card.color);
+          const progressPercentage = Math.min((card.value / 300) * 100, 100);
           
           return (
-            <div key={stat.id} className="bg-white border border-border rounded-lg p-4 hover:shadow-md transition-shadow duration-200">
+            <div key={card.id} className="bg-white dark:bg-dark-surface border border-border dark:border-dark-border rounded-lg p-3 sm:p-4 hover:shadow-md dark:hover:shadow-xl transition-shadow duration-200">
               {/* Header */}
-              <div className="flex items-center justify-between mb-4">
-                <div className={`w-10 h-10 ${colors.bg} rounded-lg flex items-center justify-center`}>
-                  <Icon name={stat.icon} size={20} className={colors.icon} />
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <div className={`w-8 h-8 sm:w-10 sm:h-10 ${colors.bg} rounded-lg flex items-center justify-center`}>
+                  <Icon name={card.icon} size={16} className={colors.icon} />
                 </div>
                 <div className={`text-xs px-2 py-1 rounded-full ${
-                  stat.changeType === 'positive' ?'bg-success-100 text-success-700' :'bg-error-100 text-error-700'
+                  card.changeType === 'positive' 
+                    ? 'bg-success-100 dark:bg-success-900/30 text-success-700 dark:text-success-400' 
+                    : 'bg-error-100 dark:bg-error-900/30 text-error-700 dark:text-error-400'
                 }`}>
-                  {stat.change}
+                  {card.change}
                 </div>
               </div>
 
               {/* Value */}
               <div className="mb-3">
-                <div className="text-2xl font-heading font-bold text-text-primary mb-1">
-                  {formatValue(stat.value, stat.unit)}
+                <div className="text-xl sm:text-2xl font-heading font-bold text-text-primary dark:text-dark-text-primary mb-1">
+                  {formatValue(card.value, 'min')}
                 </div>
-                <h3 className="text-sm font-medium text-text-secondary">
-                  {stat.title}
+                <h3 className="text-xs sm:text-sm font-medium text-text-secondary dark:text-dark-text-secondary">
+                  {card.title}
                 </h3>
               </div>
 
               {/* Progress bar */}
               <div className="mb-3">
-                <div className="flex items-center justify-between text-xs text-text-tertiary mb-1">
-                  <span>Progress</span>
+                <div className="flex items-center justify-between text-xs text-text-tertiary dark:text-dark-text-tertiary mb-1">
+                  <span>Fortschritt</span>
                   <span>{Math.round(progressPercentage)}%</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
                   <div 
                     className={`h-2 rounded-full transition-all duration-500 ${
-                      stat.color === 'primary' ? 'bg-primary' :
-                      stat.color === 'secondary'? 'bg-secondary' : 'bg-accent'
+                      card.color === 'primary' ? 'bg-primary' :
+                      card.color === 'secondary'? 'bg-secondary' : 'bg-accent'
                     }`}
                     style={{ width: `${progressPercentage}%` }}
                   ></div>
@@ -124,8 +188,8 @@ const StatisticsCards = ({ stats }) => {
               </div>
 
               {/* Description */}
-              <p className="text-xs text-text-tertiary">
-                {stat.description}
+              <p className="text-xs text-text-tertiary dark:text-dark-text-tertiary">
+                {card.description}
               </p>
             </div>
           );
@@ -133,15 +197,15 @@ const StatisticsCards = ({ stats }) => {
       </div>
 
       {/* Summary insights */}
-      <div className="mt-6 p-4 bg-gradient-to-r from-primary-50 to-secondary-50 rounded-lg">
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-success rounded-full flex items-center justify-center">
+      <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-gradient-to-r from-primary-50 to-secondary-50 dark:from-primary-900/20 dark:to-secondary-900/20 rounded-lg">
+        <div className="flex items-start sm:items-center space-x-3">
+          <div className="w-8 h-8 bg-success rounded-full flex items-center justify-center flex-shrink-0">
             <Icon name="TrendingUp" size={16} className="text-white" />
           </div>
-          <div>
-            <h4 className="font-medium text-text-primary">Great Progress!</h4>
-            <p className="text-sm text-text-secondary">
-              You're ahead of your weekly goals. Keep up the excellent work!
+          <div className="flex-1 min-w-0">
+            <h4 className="font-medium text-text-primary dark:text-dark-text-primary text-sm sm:text-base">Großartige Fortschritte!</h4>
+            <p className="text-xs sm:text-sm text-text-secondary dark:text-dark-text-secondary">
+              Du bist weit vorankommen. Halt die gute Arbeit bei!
             </p>
           </div>
         </div>

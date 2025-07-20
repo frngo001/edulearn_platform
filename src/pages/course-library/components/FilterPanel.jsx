@@ -118,12 +118,13 @@ const FilterPanel = ({ isOpen, onClose, onApply, activeFilters }) => {
               size={20}
               className={`transition-colors duration-150 ${
                 star <= rating
-                  ? 'text-yellow-400 fill-current' :'text-gray-300 hover:text-yellow-200'
+                  ? 'text-yellow-400 fill-current' 
+                  : 'text-gray-300 dark:text-gray-600 hover:text-yellow-200'
               }`}
             />
           </button>
         ))}
-        <span className="text-sm text-text-secondary ml-2">
+        <span className="text-sm text-text-secondary dark:text-dark-text-secondary ml-2">
           {rating > 0 ? `${rating}+ stars` : 'Any rating'}
         </span>
       </div>
@@ -141,20 +142,20 @@ const FilterPanel = ({ isOpen, onClose, onApply, activeFilters }) => {
       />
 
       {/* Filter Panel */}
-      <div className={`fixed top-0 right-0 h-full w-full max-w-sm bg-surface border-l border-border z-50 transform transition-transform duration-300 overflow-y-auto ${
+      <div className={`fixed top-0 right-0 h-full w-full max-w-sm bg-surface dark:bg-dark-surface border-l border-border dark:border-dark-border z-50 transform transition-transform duration-300 overflow-y-auto ${
         isOpen ? 'translate-x-0' : 'translate-x-full'
       } md:relative md:transform-none md:w-80`}>
         
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-border">
-          <h2 className="text-lg font-heading font-semibold text-text-primary">
+        <div className="flex items-center justify-between p-6 border-b border-border dark:border-dark-border">
+          <h2 className="text-lg font-heading font-semibold text-text-primary dark:text-dark-text-primary">
             Filters
           </h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-150"
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150"
           >
-            <Icon name="X" size={20} className="text-text-secondary" />
+            <Icon name="X" size={20} className="text-text-secondary dark:text-dark-text-secondary" />
           </button>
         </div>
 
@@ -167,11 +168,11 @@ const FilterPanel = ({ isOpen, onClose, onApply, activeFilters }) => {
               onClick={() => toggleSection('price')}
               className="flex items-center justify-between w-full mb-3"
             >
-              <h3 className="font-medium text-text-primary">Price Range</h3>
+              <h3 className="font-medium text-text-primary dark:text-dark-text-primary">Price Range</h3>
               <Icon
                 name="ChevronDown"
                 size={16}
-                className={`text-text-tertiary transition-transform duration-150 ${
+                className={`text-text-tertiary dark:text-dark-text-tertiary transition-transform duration-150 ${
                   expandedSections.price ? 'rotate-180' : ''
                 }`}
               />
@@ -180,23 +181,23 @@ const FilterPanel = ({ isOpen, onClose, onApply, activeFilters }) => {
               <div className="space-y-4">
                 <div className="flex items-center space-x-4">
                   <div className="flex-1">
-                    <label className="block text-sm text-text-secondary mb-1">Min</label>
+                    <label className="block text-sm text-text-secondary dark:text-dark-text-secondary mb-1">Min</label>
                     <input
                       type="number"
                       value={filters.priceRange[0]}
                       onChange={(e) => handlePriceRangeChange(0, e.target.value)}
-                      className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-3 py-2 border border-border dark:border-dark-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-dark-background text-text-primary dark:text-dark-text-primary"
                       min="0"
                       max="200"
                     />
                   </div>
                   <div className="flex-1">
-                    <label className="block text-sm text-text-secondary mb-1">Max</label>
+                    <label className="block text-sm text-text-secondary dark:text-dark-text-secondary mb-1">Max</label>
                     <input
                       type="number"
                       value={filters.priceRange[1]}
                       onChange={(e) => handlePriceRangeChange(1, e.target.value)}
-                      className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-3 py-2 border border-border dark:border-dark-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-dark-background text-text-primary dark:text-dark-text-primary"
                       min="0"
                       max="200"
                     />
@@ -209,7 +210,7 @@ const FilterPanel = ({ isOpen, onClose, onApply, activeFilters }) => {
                     max="200"
                     value={filters.priceRange[0]}
                     onChange={(e) => handlePriceRangeChange(0, e.target.value)}
-                    className="absolute w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                    className="absolute w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer"
                   />
                   <input
                     type="range"
@@ -217,10 +218,10 @@ const FilterPanel = ({ isOpen, onClose, onApply, activeFilters }) => {
                     max="200"
                     value={filters.priceRange[1]}
                     onChange={(e) => handlePriceRangeChange(1, e.target.value)}
-                    className="absolute w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                    className="absolute w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer"
                   />
                 </div>
-                <div className="flex justify-between text-sm text-text-secondary">
+                <div className="flex justify-between text-sm text-text-secondary dark:text-dark-text-secondary">
                   <span>${filters.priceRange[0]}</span>
                   <span>${filters.priceRange[1]}</span>
                 </div>
@@ -234,11 +235,11 @@ const FilterPanel = ({ isOpen, onClose, onApply, activeFilters }) => {
               onClick={() => toggleSection('difficulty')}
               className="flex items-center justify-between w-full mb-3"
             >
-              <h3 className="font-medium text-text-primary">Difficulty Level</h3>
+              <h3 className="font-medium text-text-primary dark:text-dark-text-primary">Difficulty Level</h3>
               <Icon
                 name="ChevronDown"
                 size={16}
-                className={`text-text-tertiary transition-transform duration-150 ${
+                className={`text-text-tertiary dark:text-dark-text-tertiary transition-transform duration-150 ${
                   expandedSections.difficulty ? 'rotate-180' : ''
                 }`}
               />
@@ -251,9 +252,9 @@ const FilterPanel = ({ isOpen, onClose, onApply, activeFilters }) => {
                       type="checkbox"
                       checked={filters.difficulty.includes(difficulty)}
                       onChange={() => handleDifficultyToggle(difficulty)}
-                      className="w-4 h-4 text-primary border-border rounded focus:ring-primary-500"
+                      className="w-4 h-4 text-primary border-border dark:border-dark-border rounded focus:ring-primary-500"
                     />
-                    <span className="text-sm text-text-secondary">{difficulty}</span>
+                    <span className="text-sm text-text-secondary dark:text-dark-text-secondary">{difficulty}</span>
                   </label>
                 ))}
               </div>
@@ -266,11 +267,11 @@ const FilterPanel = ({ isOpen, onClose, onApply, activeFilters }) => {
               onClick={() => toggleSection('duration')}
               className="flex items-center justify-between w-full mb-3"
             >
-              <h3 className="font-medium text-text-primary">Duration</h3>
+              <h3 className="font-medium text-text-primary dark:text-dark-text-primary">Duration</h3>
               <Icon
                 name="ChevronDown"
                 size={16}
-                className={`text-text-tertiary transition-transform duration-150 ${
+                className={`text-text-tertiary dark:text-dark-text-tertiary transition-transform duration-150 ${
                   expandedSections.duration ? 'rotate-180' : ''
                 }`}
               />
@@ -285,9 +286,9 @@ const FilterPanel = ({ isOpen, onClose, onApply, activeFilters }) => {
                       value={option.value}
                       checked={filters.duration === option.value}
                       onChange={(e) => setFilters({ ...filters, duration: e.target.value })}
-                      className="w-4 h-4 text-primary border-border focus:ring-primary-500"
+                      className="w-4 h-4 text-primary border-border dark:border-dark-border focus:ring-primary-500"
                     />
-                    <span className="text-sm text-text-secondary">{option.label}</span>
+                    <span className="text-sm text-text-secondary dark:text-dark-text-secondary">{option.label}</span>
                   </label>
                 ))}
               </div>
@@ -300,11 +301,11 @@ const FilterPanel = ({ isOpen, onClose, onApply, activeFilters }) => {
               onClick={() => toggleSection('rating')}
               className="flex items-center justify-between w-full mb-3"
             >
-              <h3 className="font-medium text-text-primary">Minimum Rating</h3>
+              <h3 className="font-medium text-text-primary dark:text-dark-text-primary">Minimum Rating</h3>
               <Icon
                 name="ChevronDown"
                 size={16}
-                className={`text-text-tertiary transition-transform duration-150 ${
+                className={`text-text-tertiary dark:text-dark-text-tertiary transition-transform duration-150 ${
                   expandedSections.rating ? 'rotate-180' : ''
                 }`}
               />
@@ -324,11 +325,11 @@ const FilterPanel = ({ isOpen, onClose, onApply, activeFilters }) => {
               onClick={() => toggleSection('language')}
               className="flex items-center justify-between w-full mb-3"
             >
-              <h3 className="font-medium text-text-primary">Language</h3>
+              <h3 className="font-medium text-text-primary dark:text-dark-text-primary">Language</h3>
               <Icon
                 name="ChevronDown"
                 size={16}
-                className={`text-text-tertiary transition-transform duration-150 ${
+                className={`text-text-tertiary dark:text-dark-text-tertiary transition-transform duration-150 ${
                   expandedSections.language ? 'rotate-180' : ''
                 }`}
               />
@@ -341,9 +342,9 @@ const FilterPanel = ({ isOpen, onClose, onApply, activeFilters }) => {
                       type="checkbox"
                       checked={filters.language.includes(language)}
                       onChange={() => handleLanguageToggle(language)}
-                      className="w-4 h-4 text-primary border-border rounded focus:ring-primary-500"
+                      className="w-4 h-4 text-primary border-border dark:border-dark-border rounded focus:ring-primary-500"
                     />
-                    <span className="text-sm text-text-secondary">{language}</span>
+                    <span className="text-sm text-text-secondary dark:text-dark-text-secondary">{language}</span>
                   </label>
                 ))}
               </div>
@@ -356,11 +357,11 @@ const FilterPanel = ({ isOpen, onClose, onApply, activeFilters }) => {
               onClick={() => toggleSection('category')}
               className="flex items-center justify-between w-full mb-3"
             >
-              <h3 className="font-medium text-text-primary">Category</h3>
+              <h3 className="font-medium text-text-primary dark:text-dark-text-primary">Category</h3>
               <Icon
                 name="ChevronDown"
                 size={16}
-                className={`text-text-tertiary transition-transform duration-150 ${
+                className={`text-text-tertiary dark:text-dark-text-tertiary transition-transform duration-150 ${
                   expandedSections.category ? 'rotate-180' : ''
                 }`}
               />
@@ -373,9 +374,9 @@ const FilterPanel = ({ isOpen, onClose, onApply, activeFilters }) => {
                       type="checkbox"
                       checked={filters.category.includes(category)}
                       onChange={() => handleCategoryToggle(category)}
-                      className="w-4 h-4 text-primary border-border rounded focus:ring-primary-500"
+                      className="w-4 h-4 text-primary border-border dark:border-dark-border rounded focus:ring-primary-500"
                     />
-                    <span className="text-sm text-text-secondary">{category}</span>
+                    <span className="text-sm text-text-secondary dark:text-dark-text-secondary">{category}</span>
                   </label>
                 ))}
               </div>
@@ -384,7 +385,7 @@ const FilterPanel = ({ isOpen, onClose, onApply, activeFilters }) => {
         </div>
 
         {/* Footer Actions */}
-        <div className="sticky bottom-0 bg-surface border-t border-border p-6 space-y-3">
+        <div className="sticky bottom-0 bg-surface dark:bg-dark-surface border-t border-border dark:border-dark-border p-6 space-y-3">
           <button
             onClick={handleApply}
             className="w-full bg-primary text-white py-3 px-4 rounded-lg hover:bg-primary-700 transition-colors duration-150 font-medium"
@@ -393,7 +394,7 @@ const FilterPanel = ({ isOpen, onClose, onApply, activeFilters }) => {
           </button>
           <button
             onClick={handleClear}
-            className="w-full bg-surface border border-border text-text-secondary py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors duration-150 font-medium"
+            className="w-full bg-surface dark:bg-dark-surface border border-border dark:border-dark-border text-text-secondary dark:text-dark-text-secondary py-3 px-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150 font-medium"
           >
             Clear All
           </button>

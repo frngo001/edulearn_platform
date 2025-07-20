@@ -19,7 +19,8 @@ const ProgressIndicator = ({ currentStep, totalSteps }) => {
                   step.number < currentStep
                     ? 'bg-success text-white'
                     : step.number === currentStep
-                    ? 'bg-primary text-white' :'bg-gray-200 text-text-tertiary'
+                    ? 'bg-primary text-white'
+                    : 'bg-gray-200 dark:bg-gray-700 text-text-tertiary dark:text-dark-text-tertiary'
                 }`}
               >
                 {step.number < currentStep ? (
@@ -31,7 +32,8 @@ const ProgressIndicator = ({ currentStep, totalSteps }) => {
               <span
                 className={`text-xs mt-2 font-caption ${
                   step.number <= currentStep
-                    ? 'text-text-primary font-medium' :'text-text-tertiary'
+                    ? 'text-text-primary dark:text-dark-text-primary font-medium'
+                    : 'text-text-tertiary dark:text-dark-text-tertiary'
                 }`}
               >
                 {step.title}
@@ -43,7 +45,8 @@ const ProgressIndicator = ({ currentStep, totalSteps }) => {
                 <div
                   className={`h-0.5 transition-all duration-200 ${
                     step.number < currentStep
-                      ? 'bg-success' :'bg-gray-200'
+                      ? 'bg-success'
+                      : 'bg-gray-200 dark:bg-gray-700'
                   }`}
                 />
               </div>

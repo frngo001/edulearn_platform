@@ -7,6 +7,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom scrollbar hiding */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 @layer base {
   :root {
     /* Primary Colors */
@@ -197,5 +207,15 @@
 
   .animation-delay-450 {
     animation-delay: 450ms;
+  }
+
+    /* Custom scrollbar styles */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }

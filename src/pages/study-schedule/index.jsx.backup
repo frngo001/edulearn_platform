@@ -1,0 +1,1200 @@
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import Icon from 'components/AppIcon';
+import ContextualHeader from 'components/ui/ContextualHeader';
+import BottomTabNavigation from 'components/ui/BottomTabNavigation';
+import NavigationBridge from 'components/ui/NavigationBridge';
+import StudySessionOverlay from 'components/ui/StudySessionOverlay';
+
+
+const StudySchedule = () => {
+  const [viewMode, setViewMode] = useState('week'); // week, day
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [showAddEvent, setShowAddEvent] = useState(false);
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
+  const [events, setEvents] = useState([]);
+  const [newEvent, setNewEvent] = useState({
+    title: '',
+    subject: '',
+    startTime: '',
+    endTime: '',
+    day: 'monday',
+    type: 'study',
+    priority: 'medium',
+    recurring: true,
+    location: '',
+    description: ''
+  });
+  const [formErrors, setFormErrors] = useState({});
+
+  // Mock schedule data
+  const scheduleEvents = [
+    {
+      id: 1,
+      title: 'JavaScript Fundamentals',
+      subject: 'Web Development',
+      startTime: '09:00',
+      endTime: '10:30',
+      day: 'monday',
+      type: 'study',
+      priority: 'high',
+      recurring: true,
+      location: 'Home Office',
+      color: 'bg-blue-500'
+    },
+    {
+      id: 2,
+      title: 'React Components Deep Dive',
+      subject: 'Frontend Development',
+      startTime: '11:00',
+      endTime: '12:30',
+      day: 'monday',
+      type: 'study',
+      priority: 'high',
+      recurring: true,
+      location: 'Library',
+      color: 'bg-cyan-500'
+    },
+    {
+      id: 3,
+      title: 'CSS Grid Workshop',
+      subject: 'Web Design',
+      startTime: '14:00',
+      endTime: '15:30',
+      day: 'monday',
+      type: 'workshop',
+      priority: 'medium',
+      recurring: false,
+      location: 'Online',
+      color: 'bg-purple-500'
+    },
+    {
+      id: 4,
+      title: 'Python Data Structures',
+      subject: 'Programming',
+      startTime: '10:00',
+      endTime: '11:30',
+      day: 'tuesday',
+      type: 'study',
+      priority: 'high',
+      recurring: true,
+      location: 'Home Office',
+      color: 'bg-green-500'
+    },
+    {
+      id: 5,
+      title: 'Algorithm Practice',
+      subject: 'Computer Science',
+      startTime: '16:00',
+      endTime: '17:30',
+      day: 'tuesday',
+      type: 'practice',
+      priority: 'medium',
+      recurring: true,
+      location: 'Study Room',
+      color: 'bg-orange-500'
+    },
+    {
+      id: 6,
+      title: 'Database Design Review',
+      subject: 'Backend Development',
+      startTime: '09:30',
+      endTime: '11:00',
+      day: 'wednesday',
+      type: 'review',
+      priority: 'high',
+      recurring: true,
+      location: 'Library',
+      color: 'bg-red-500'
+    },
+    {
+      id: 7,
+      title: 'UI/UX Design Principles',
+      subject: 'Design',
+      startTime: '13:00',
+      endTime: '14:30',
+      day: 'wednesday',
+      type: 'study',
+      priority: 'medium',
+      recurring: true,
+      location: 'Online',
+      color: 'bg-pink-500'
+    },
+    {
+      id: 8,
+      title: 'Node.js Server Architecture',
+      subject: 'Backend Development',
+      startTime: '15:00',
+      endTime: '16:30',
+      day: 'thursday',
+      type: 'study',
+      priority: 'high',
+      recurring: true,
+      location: 'Home Office',
+      color: 'bg-indigo-500'
+    },
+    {
+      id: 9,
+      title: 'Project Review Meeting',
+      subject: 'General',
+      startTime: '10:00',
+      endTime: '11:00',
+      day: 'friday',
+      type: 'meeting',
+      priority: 'high',
+      recurring: false,
+      location: 'Conference Room',
+      color: 'bg-gray-500'
+    },
+    {
+      id: 10,
+      title: 'Weekend Project Work',
+      subject: 'Practice',
+      startTime: '14:00',
+      endTime: '17:00',
+      day: 'saturday',
+      type: 'project',
+      priority: 'medium',
+      recurring: true,
+      location: 'Home Office',
+      color: 'bg-teal-500'
+    }
+  ];
+
+  // Initialize events state
+  useEffect(() => {
+    setEvents(scheduleEvents);
+  }, []);
+
+  const timeSlots = [
+    '08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+    '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
+    '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30'
+  ];
+
+  const daysOfWeek = [
+    { id: 'monday', label: 'Mo', fullName: 'Montag' },
+    { id: 'tuesday', label: 'Di', fullName: 'Dienstag' },
+    { id: 'wednesday', label: 'Mi', fullName: 'Mittwoch' },
+    { id: 'thursday', label: 'Do', fullName: 'Donnerstag' },
+    { id: 'friday', label: 'Fr', fullName: 'Freitag' },
+    { id: 'saturday', label: 'Sa', fullName: 'Samstag' },
+    { id: 'sunday', label: 'So', fullName: 'Sonntag' }
+  ];
+
+  const eventTypes = [
+    { id: 'study', label: 'Study Session', icon: 'BookOpen', color: 'bg-blue-500' },
+    { id: 'workshop', label: 'Workshop', icon: 'Users', color: 'bg-purple-500' },
+    { id: 'practice', label: 'Practice', icon: 'Code', color: 'bg-orange-500' },
+    { id: 'review', label: 'Review', icon: 'Eye', color: 'bg-red-500' },
+    { id: 'meeting', label: 'Meeting', icon: 'MessageSquare', color: 'bg-gray-500' },
+    { id: 'project', label: 'Project Work', icon: 'Folder', color: 'bg-teal-500' },
+    { id: 'quiz', label: 'Quiz/Test', icon: 'HelpCircle', color: 'bg-red-600' },
+    { id: 'assignment', label: 'Assignment', icon: 'FileText', color: 'bg-green-600' }
+  ];
+
+  const priorityOptions = [
+    { id: 'high', label: 'High Priority', color: 'text-red-600' },
+    { id: 'medium', label: 'Medium Priority', color: 'text-yellow-600' },
+    { id: 'low', label: 'Low Priority', color: 'text-green-600' }
+  ];
+
+  const scheduleStats = {
+    weeklyHours: 18.5,
+    studySessions: 12,
+    averageSessionLength: 1.5,
+    mostProductiveTime: '10:00 AM',
+    completionRate: 87
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    
+    if (!newEvent.title.trim()) {
+      errors.title = 'Title is required';
+    }
+    
+    if (!newEvent.subject.trim()) {
+      errors.subject = 'Subject is required';
+    }
+    
+    if (!newEvent.startTime) {
+      errors.startTime = 'Start time is required';
+    }
+    
+    if (!newEvent.endTime) {
+      errors.endTime = 'End time is required';
+    }
+    
+    if (newEvent.startTime && newEvent.endTime && newEvent.startTime >= newEvent.endTime) {
+      errors.endTime = 'End time must be after start time';
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleInputChange = (field, value) => {
+    setNewEvent(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    
+    // Clear error for this field when user starts typing
+    if (formErrors[field]) {
+      setFormErrors(prev => ({
+        ...prev,
+        [field]: ''
+      }));
+    }
+  };
+
+  const getEventTypeColor = (type) => {
+    const eventType = eventTypes.find(t => t.id === type);
+    return eventType ? eventType.color : 'bg-gray-500';
+  };
+
+  const handleAddEvent = () => {
+    if (!validateForm()) {
+      return;
+    }
+
+    const eventType = eventTypes.find(t => t.id === newEvent.type);
+    
+    const event = {
+      id: Date.now(), // Simple ID generation
+      title: newEvent.title,
+      subject: newEvent.subject,
+      startTime: newEvent.startTime,
+      endTime: newEvent.endTime,
+      day: newEvent.day,
+      type: newEvent.type,
+      priority: newEvent.priority,
+      recurring: newEvent.recurring,
+      location: newEvent.location,
+      description: newEvent.description,
+      color: eventType.color
+    };
+
+    setEvents(prev => [...prev, event]);
+    
+    // Reset form
+    setNewEvent({
+      title: '',
+      subject: '',
+      startTime: '',
+      endTime: '',
+      day: 'monday',
+      type: 'study',
+      priority: 'medium',
+      recurring: true,
+      location: '',
+      description: ''
+    });
+    
+    setFormErrors({});
+    setShowAddEvent(false);
+    setSelectedTimeSlot(null);
+  };
+
+  const handleCloseModal = () => {
+    setShowAddEvent(false);
+    setFormErrors({});
+    setSelectedTimeSlot(null);
+    setNewEvent({
+      title: '',
+      subject: '',
+      startTime: '',
+      endTime: '',
+      day: 'monday',
+      type: 'study',
+      priority: 'medium',
+      recurring: true,
+      location: '',
+      description: ''
+    });
+  };
+
+  // Handle time slot click to pre-populate modal
+  const handleTimeSlotClick = (timeSlot) => {
+    if (typeof timeSlot === 'object' && timeSlot.day && timeSlot.time) {
+      setSelectedTimeSlot(timeSlot);
+      setNewEvent(prev => ({
+        ...prev,
+        day: timeSlot.day,
+        startTime: timeSlot.time,
+        endTime: timeSlot.time // Will be updated by user
+      }));
+      setShowAddEvent(true);
+    } else if (typeof timeSlot === 'object' && timeSlot.id) {
+      // Existing event clicked
+      setSelectedTimeSlot(timeSlot);
+    }
+  };
+
+  const getEventsForDay = (day) => {
+    return events.filter(event => event.day === day);
+  };
+
+  const getEventTypeIcon = (type) => {
+    const eventType = eventTypes.find(t => t.id === type);
+    return eventType ? eventType.icon : 'Calendar';
+  };
+
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case 'high': return 'border-l-4 border-red-500';
+      case 'medium': return 'border-l-4 border-yellow-500';
+      case 'low': return 'border-l-4 border-green-500';
+      default: return 'border-l-4 border-gray-500';
+    }
+  };
+
+  const formatTime = (time) => {
+    const [hours, minutes] = time.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const displayHour = hour % 12 || 12;
+    return `${displayHour}:${minutes} ${ampm}`;
+  };
+
+  const isTimeSlotOccupied = (day, time) => {
+    return events.some(event => {
+      if (event.day !== day) return false;
+      const eventStart = event.startTime;
+      const eventEnd = event.endTime;
+      return time >= eventStart && time < eventEnd;
+    });
+  };
+
+  return (
+    <div className="min-h-screen bg-background dark:bg-dark-background">
+      <ContextualHeader />
+      
+      <main className="pt-16 pb-20 md:pb-4 md:pl-16">
+        <div className="p-4 space-y-6 max-w-7xl mx-auto md:p-6 lg:p-8">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-2"
+          >
+            <h1 className="text-2xl font-bold text-text-primary dark:text-dark-text-primary md:text-3xl">
+              Stundenplan
+            </h1>
+            <p className="text-base text-text-secondary dark:text-dark-text-secondary md:text-lg">
+              Plane und organisiere deine Lernzeiten effizient
+            </p>
+          </motion.div>
+
+            {/* View Controls - Redesigned in Learning Steps Style */}
+            <motion.div 
+              className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+            >
+              {/* View Mode Selector - Learning Steps Style */}
+              <div className="bg-surface dark:bg-dark-surface rounded-2xl p-1 border border-border/20 dark:border-dark-border/20">
+                <div className="flex">
+                  <button
+                    onClick={() => setViewMode('week')}
+                    className={`px-4 py-2 text-sm font-medium rounded-xl transition-all duration-200 ${
+                      viewMode === 'week'
+                        ? 'bg-surface-secondary dark:bg-dark-surface-secondary text-text-primary dark:text-dark-text-primary'
+                        : 'text-text-secondary dark:text-dark-text-secondary hover:text-text-primary dark:hover:text-dark-text-primary'
+                    }`}
+                  >
+                    <span className="md:hidden">Woche</span>
+                    <span className="hidden md:inline">Wochenansicht</span>
+                  </button>
+                  <button
+                    onClick={() => setViewMode('day')}
+                    className={`px-4 py-2 text-sm font-medium rounded-xl transition-all duration-200 ${
+                      viewMode === 'day'
+                        ? 'bg-surface-secondary dark:bg-dark-surface-secondary text-text-primary dark:text-dark-text-primary'
+                        : 'text-text-secondary dark:text-dark-text-secondary hover:text-text-primary dark:hover:text-dark-text-primary'
+                    }`}
+                  >
+                    <span className="md:hidden">Tag</span>
+                    <span className="hidden md:inline">Tagesansicht</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Quick Stats - Learning Steps Style */}
+              <div className="grid grid-cols-3 gap-3 md:flex md:items-center md:space-x-4">
+                <div className="bg-surface dark:bg-dark-surface rounded-2xl p-3 border border-border/20 dark:border-dark-border/20">
+                  <div className="flex items-center space-x-2">
+                    <Icon name="Calendar" size={16} className="text-text-tertiary dark:text-dark-text-tertiary" />
+                    <div>
+                      <p className="text-xs text-text-secondary dark:text-dark-text-secondary">Diese Woche</p>
+                      <p className="text-sm font-bold text-text-primary dark:text-dark-text-primary">
+                        {scheduleStats.studySessions}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-surface dark:bg-dark-surface rounded-2xl p-3 border border-border/20 dark:border-dark-border/20">
+                  <div className="flex items-center space-x-2">
+                    <Icon name="Clock" size={16} className="text-text-tertiary dark:text-dark-text-tertiary" />
+                    <div>
+                      <p className="text-xs text-text-secondary dark:text-dark-text-secondary">Stunden</p>
+                      <p className="text-sm font-bold text-text-primary dark:text-dark-text-primary">
+                        {scheduleStats.weeklyHours}h
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-surface dark:bg-dark-surface rounded-2xl p-3 border border-border/20 dark:border-dark-border/20">
+                  <div className="flex items-center space-x-2">
+                    <Icon name="Target" size={16} className="text-text-tertiary dark:text-dark-text-tertiary" />
+                    <div>
+                      <p className="text-xs text-text-secondary dark:text-dark-text-secondary">Erreicht</p>
+                      <p className="text-sm font-bold text-text-primary dark:text-dark-text-primary">
+                        {scheduleStats.completionRate}%
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Button */}
+              <button
+                onClick={() => setShowAddEvent(true)}
+                className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary-600 transition-colors duration-200 shadow-sm md:px-6 md:py-3"
+              >
+                <Icon name="Plus" size={18} className="md:w-5 md:h-5" />
+                <span className="text-sm font-medium md:text-base">Hinzufügen</span>
+              </button>
+            </motion.div>
+
+            {/* Calendar Content */}
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-4 lg:gap-8">
+              {/* Main Schedule Area */}
+              <div className="lg:col-span-3">
+                {viewMode === 'week' ? (
+                  <motion.div 
+                    className="bg-surface dark:bg-dark-surface rounded-2xl p-4 border border-border/20 dark:border-dark-border/20 md:p-6"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: 0.2 }}
+                  >
+                    {/* Mobile Week View - Beautiful Card Design */}
+                    <div className="block md:hidden space-y-4">
+                      {daysOfWeek.map((day, dayIndex) => {
+                        const dayEvents = getEventsForDay(day.id);
+                        const isToday = new Date().getDay() === (dayIndex + 1) % 7;
+                        
+                        return (
+                          <motion.div
+                            key={day.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 + dayIndex * 0.05 }}
+                            className={`bg-surface-secondary dark:bg-dark-surface-secondary rounded-2xl p-4 border ${
+                              isToday 
+                                ? 'border-primary/30 dark:border-primary/30 bg-primary/5 dark:bg-primary/10' 
+                                : 'border-border/10 dark:border-dark-border/10'
+                            }`}
+                          >
+                            {/* Day Header */}
+                            <div className="flex items-center justify-between mb-4">
+                              <div className="flex items-center space-x-3">
+                                <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+                                  isToday 
+                                    ? 'bg-primary text-white' 
+                                    : 'bg-surface dark:bg-dark-surface'
+                                }`}>
+                                  <span className="text-sm font-bold">
+                                    {new Date().getDate() + dayIndex}
+                                  </span>
+                                </div>
+                                <div>
+                                  <h3 className="text-base font-semibold text-text-primary dark:text-dark-text-primary">
+                                    {day.fullName}
+                                  </h3>
+                                  {isToday && (
+                                    <span className="text-xs text-primary font-medium">Heute</span>
+                                  )}
+                                </div>
+                              </div>
+                              {dayEvents.length > 0 && (
+                                <div className="flex items-center space-x-1">
+                                  <Icon name="Calendar" size={14} className="text-text-tertiary dark:text-dark-text-tertiary" />
+                                  <span className="text-xs text-text-secondary dark:text-dark-text-secondary">
+                                    {dayEvents.length} Termine
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Events for the day */}
+                            {dayEvents.length > 0 ? (
+                              <div className="space-y-3">
+                                {dayEvents.map((event, eventIndex) => (
+                                  <motion.div
+                                    key={event.id}
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.2 + eventIndex * 0.05 }}
+                                    className={`${event.color} text-white p-4 rounded-2xl shadow-sm active:scale-95 transition-all duration-200 cursor-pointer`}
+                                    onClick={() => handleTimeSlotClick(event)}
+                                  >
+                                    <div className="flex items-start justify-between">
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex items-center space-x-2 mb-2">
+                                          <Icon name={getEventTypeIcon(event.type)} size={16} className="text-white/90" />
+                                          <h4 className="text-sm font-semibold truncate">
+                                            {event.title}
+                                          </h4>
+                                        </div>
+                                        <p className="text-xs text-white/80 mb-3 line-clamp-1">
+                                          {event.subject}
+                                        </p>
+                                        
+                                        <div className="flex items-center justify-between">
+                                          <div className="flex items-center space-x-3">
+                                            <div className="flex items-center space-x-1">
+                                              <Icon name="Clock" size={12} className="text-white/70" />
+                                              <span className="text-xs text-white/90">
+                                                {formatTime(event.startTime)} - {formatTime(event.endTime)}
+                                              </span>
+                                            </div>
+                                            <div className="flex items-center space-x-1">
+                                              <Icon name="MapPin" size={12} className="text-white/70" />
+                                              <span className="text-xs text-white/90 truncate">
+                                                {event.location}
+                                              </span>
+                                            </div>
+                                          </div>
+                                          {event.priority === 'high' && (
+                                            <div className="flex items-center">
+                                              <Icon name="AlertCircle" size={12} className="text-white/90" />
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                      <button className="p-1 hover:bg-white/20 rounded-lg ml-3 transition-colors duration-200">
+                                        <Icon name="MoreVertical" size={16} />
+                                      </button>
+                                    </div>
+                                  </motion.div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="text-center py-6">
+                                <div className="w-12 h-12 bg-surface dark:bg-dark-surface rounded-2xl flex items-center justify-center mx-auto mb-3">
+                                  <Icon name="Calendar" size={20} className="text-text-tertiary dark:text-dark-text-tertiary" />
+                                </div>
+                                <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-2">
+                                  Keine Termine geplant
+                                </p>
+                                <button 
+                                  className="text-xs text-primary hover:underline font-medium"
+                                  onClick={() => setShowAddEvent(true)}
+                                >
+                                  Termin hinzufügen
+                                </button>
+                              </div>
+                            )}
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Desktop Week View - Enhanced Grid */}
+                    <div className="hidden md:block">
+                      <div className="mb-4">
+                        <h3 className="text-lg font-semibold text-text-primary dark:text-dark-text-primary mb-4">
+                          Wochenübersicht
+                        </h3>
+                      </div>
+                      
+                      <div className="overflow-x-auto">
+                        <div className="min-w-full">
+                          {/* Enhanced Header Row */}
+                          <div className="grid grid-cols-8 gap-2 mb-4">
+                            <div className="text-sm font-medium text-text-secondary dark:text-dark-text-secondary p-3 bg-surface-secondary dark:bg-dark-surface-secondary rounded-xl">
+                              Zeit
+                            </div>
+                            {daysOfWeek.map((day, index) => {
+                              const isToday = new Date().getDay() === (index + 1) % 7;
+                              return (
+                                <div key={day.id} className={`text-center p-3 rounded-xl border ${
+                                  isToday 
+                                    ? 'bg-primary/10 dark:bg-primary/20 border-primary/30' 
+                                    : 'bg-surface-secondary dark:bg-dark-surface-secondary border-border/10 dark:border-dark-border/10'
+                                }`}>
+                                  <div className={`text-sm font-semibold ${
+                                    isToday ? 'text-primary' : 'text-text-primary dark:text-dark-text-primary'
+                                  }`}>
+                                    {day.label}
+                                  </div>
+                                  <div className={`text-xs ${
+                                    isToday ? 'text-primary/80' : 'text-text-secondary dark:text-dark-text-secondary'
+                                  }`}>
+                                    {new Date().getDate() + index}
+                                  </div>
+                                  {isToday && (
+                                    <div className="text-xs font-medium text-primary mt-1">Heute</div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {/* Enhanced Time Slots */}
+                          <div className="space-y-1">
+                            {timeSlots.map((time) => (
+                              <div key={time} className="grid grid-cols-8 gap-2 min-h-14">
+                                <div className="text-xs font-medium text-text-secondary dark:text-dark-text-secondary p-3 flex items-center bg-surface-secondary dark:bg-dark-surface-secondary rounded-xl">
+                                  {formatTime(time)}
+                                </div>
+                                {daysOfWeek.map((day) => {
+                                  const event = events.find(
+                                    e => e.day === day.id && e.startTime <= time && e.endTime > time
+                                  );
+                                  
+                                  return (
+                                    <div key={`${day.id}-${time}`} className="p-1">
+                                      {event && event.startTime === time ? (
+                                        <motion.div
+                                          className={`${event.color} text-white p-3 rounded-xl shadow-sm cursor-pointer hover:shadow-md transition-all duration-200 border border-white/20`}
+                                          initial={{ opacity: 0, scale: 0.9 }}
+                                          animate={{ opacity: 1, scale: 1 }}
+                                          transition={{ duration: 0.2 }}
+                                          onClick={() => handleTimeSlotClick(event)}
+                                        >
+                                          <div className="space-y-1">
+                                            <div className="flex items-center space-x-1">
+                                              <Icon name={getEventTypeIcon(event.type)} size={12} className="text-white/90" />
+                                              <div className="text-xs font-semibold truncate">
+                                                {event.title}
+                                              </div>
+                                            </div>
+                                            <div className="text-xs text-white/80 truncate">
+                                              {event.subject}
+                                            </div>
+                                            <div className="text-xs text-white/70">
+                                              {formatTime(event.startTime)}
+                                            </div>
+                                          </div>
+                                        </motion.div>
+                                      ) : !isTimeSlotOccupied(day.id, time) ? (
+                                        <div 
+                                          className="h-14 border-2 border-dashed border-border/30 dark:border-dark-border/30 rounded-xl hover:bg-surface-secondary/50 dark:hover:bg-dark-surface-secondary/50 cursor-pointer transition-all duration-200 flex items-center justify-center group"
+                                          onClick={() => handleTimeSlotClick({ day: day.id, time })}
+                                        >
+                                          <Icon name="Plus" size={14} className="text-text-tertiary dark:text-dark-text-tertiary opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                                        </div>
+                                      ) : null}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                ) : (
+                  // Enhanced Day View
+                  <motion.div 
+                    className="bg-surface dark:bg-dark-surface rounded-2xl p-4 border border-border/20 dark:border-dark-border/20 md:p-6"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: 0.2 }}
+                  >
+                    <div className="mb-6">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+                          <Icon name="Calendar" size={20} className="text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-bold text-text-primary dark:text-dark-text-primary md:text-xl">
+                            Heutiger Stundenplan
+                          </h3>
+                          <p className="text-sm text-text-secondary dark:text-dark-text-secondary md:text-base">
+                            {new Date().toLocaleDateString('de-DE', { 
+                              weekday: 'long', 
+                              year: 'numeric', 
+                              month: 'long', 
+                              day: 'numeric' 
+                            })}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      {getEventsForDay('monday').length > 0 ? (
+                        getEventsForDay('monday').map((event, index) => (
+                          <motion.div
+                            key={event.id}
+                            className={`${event.color} text-white p-4 rounded-2xl shadow-sm active:scale-95 transition-all duration-200 cursor-pointer border border-white/20 md:p-6`}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.3, delay: 0.3 + index * 0.1 }}
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center space-x-3 mb-3">
+                                  <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center">
+                                    <Icon name={getEventTypeIcon(event.type)} size={16} className="text-white" />
+                                  </div>
+                                  <div>
+                                    <h4 className="text-base font-semibold md:text-lg">{event.title}</h4>
+                                    <p className="text-sm text-white/80 md:text-base">{event.subject}</p>
+                                  </div>
+                                </div>
+                                
+                                {/* Mobile: Stack info vertically */}
+                                <div className="space-y-3 md:hidden">
+                                  <div className="flex items-center space-x-2">
+                                    <Icon name="Clock" size={14} className="text-white/70" />
+                                    <span className="text-sm text-white/90">
+                                      {formatTime(event.startTime)} - {formatTime(event.endTime)}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <Icon name="MapPin" size={14} className="text-white/70" />
+                                    <span className="text-sm text-white/90 truncate">{event.location}</span>
+                                  </div>
+                                  {event.recurring && (
+                                    <div className="flex items-center space-x-2">
+                                      <Icon name="Repeat" size={14} className="text-white/70" />
+                                      <span className="text-sm text-white/90">Wiederholend</span>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* Desktop: Horizontal layout */}
+                                <div className="hidden md:flex md:items-center md:space-x-6">
+                                  <div className="flex items-center space-x-2">
+                                    <Icon name="Clock" size={16} className="text-white/70" />
+                                    <span className="text-white/90">
+                                      {formatTime(event.startTime)} - {formatTime(event.endTime)}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <Icon name="MapPin" size={16} className="text-white/70" />
+                                    <span className="text-white/90">{event.location}</span>
+                                  </div>
+                                  {event.recurring && (
+                                    <div className="flex items-center space-x-2">
+                                      <Icon name="Repeat" size={16} className="text-white/70" />
+                                      <span className="text-white/90">Wiederholend</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center space-x-2 ml-4">
+                                {event.priority === 'high' && (
+                                  <div className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center">
+                                    <Icon name="AlertCircle" size={14} className="text-white" />
+                                  </div>
+                                )}
+                                <button className="p-2 hover:bg-white/20 rounded-xl transition-colors duration-200">
+                                  <Icon name="MoreVertical" size={18} />
+                                </button>
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))
+                      ) : (
+                        <div className="text-center py-12">
+                          <div className="w-16 h-16 bg-surface-secondary dark:bg-dark-surface-secondary rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <Icon name="Calendar" size={24} className="text-text-tertiary dark:text-dark-text-tertiary" />
+                          </div>
+                          <h3 className="text-base font-semibold text-text-primary dark:text-dark-text-primary mb-2">
+                            Keine Termine heute
+                          </h3>
+                          <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-4">
+                            Du hast heute keine Lerntermine geplant
+                          </p>
+                          <button 
+                            className="px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary-600 transition-colors duration-200 text-sm font-medium"
+                            onClick={() => setShowAddEvent(true)}
+                          >
+                            Ersten Termin hinzufügen
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+
+              {/* Enhanced Sidebar */}
+              <div className="space-y-6">
+                {/* Week Overview Stats */}
+                <motion.div 
+                  className="bg-surface dark:bg-dark-surface rounded-2xl p-4 border border-border/20 dark:border-dark-border/20"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: 0.3 }}
+                >
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-8 h-8 bg-surface-secondary dark:bg-dark-surface-secondary rounded-xl flex items-center justify-center">
+                      <Icon name="BarChart3" size={16} className="text-text-tertiary dark:text-dark-text-tertiary" />
+                    </div>
+                    <h3 className="text-base font-semibold text-text-primary dark:text-dark-text-primary">
+                      Diese Woche
+                    </h3>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {[
+                      { label: 'Lernstunden', value: `${scheduleStats.weeklyHours}h`, icon: 'Clock' },
+                      { label: 'Termine', value: scheduleStats.studySessions, icon: 'Calendar' },
+                      { label: 'Ø Länge', value: `${scheduleStats.averageSessionLength}h`, icon: 'BarChart3' },
+                      { label: 'Erreicht', value: `${scheduleStats.completionRate}%`, icon: 'Target' }
+                    ].map((stat, index) => (
+                      <motion.div 
+                        key={stat.label}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 + index * 0.05 }}
+                        className="flex items-center justify-between"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <Icon name={stat.icon} size={14} className="text-text-tertiary dark:text-dark-text-tertiary" />
+                          <span className="text-sm text-text-secondary dark:text-dark-text-secondary">{stat.label}</span>
+                        </div>
+                        <span className="text-sm font-semibold text-text-primary dark:text-dark-text-primary">
+                          {stat.value}
+                        </span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+
+                {/* Quick Actions */}
+                <motion.div 
+                  className="bg-surface dark:bg-dark-surface rounded-2xl p-4 border border-border/20 dark:border-dark-border/20"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: 0.4 }}
+                >
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-8 h-8 bg-surface-secondary dark:bg-dark-surface-secondary rounded-xl flex items-center justify-center">
+                      <Icon name="Zap" size={16} className="text-text-tertiary dark:text-dark-text-tertiary" />
+                    </div>
+                    <h3 className="text-base font-semibold text-text-primary dark:text-dark-text-primary">
+                      Schnellaktionen
+                    </h3>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <button className="w-full flex items-center space-x-3 p-3 text-left bg-surface-secondary dark:bg-dark-surface-secondary hover:bg-border/20 dark:hover:bg-dark-border/20 rounded-xl transition-colors duration-200">
+                      <Icon name="Calendar" size={16} className="text-text-tertiary dark:text-dark-text-tertiary" />
+                      <span className="text-sm text-text-primary dark:text-dark-text-primary">Heute planen</span>
+                    </button>
+                    <button className="w-full flex items-center space-x-3 p-3 text-left bg-surface-secondary dark:bg-dark-surface-secondary hover:bg-border/20 dark:hover:bg-dark-border/20 rounded-xl transition-colors duration-200">
+                      <Icon name="Copy" size={16} className="text-text-tertiary dark:text-dark-text-tertiary" />
+                      <span className="text-sm text-text-primary dark:text-dark-text-primary">Vorlage kopieren</span>
+                    </button>
+                    <button className="w-full flex items-center space-x-3 p-3 text-left bg-surface-secondary dark:bg-dark-surface-secondary hover:bg-border/20 dark:hover:bg-dark-border/20 rounded-xl transition-colors duration-200">
+                      <Icon name="Download" size={16} className="text-text-tertiary dark:text-dark-text-tertiary" />
+                      <span className="text-sm text-text-primary dark:text-dark-text-primary">Exportieren</span>
+                    </button>
+                  </div>
+                </motion.div>
+
+                {/* Upcoming Events */}
+                <motion.div 
+                  className="bg-surface dark:bg-dark-surface rounded-2xl p-4 border border-border/20 dark:border-dark-border/20"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: 0.5 }}
+                >
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-8 h-8 bg-surface-secondary dark:bg-dark-surface-secondary rounded-xl flex items-center justify-center">
+                      <Icon name="Clock" size={16} className="text-text-tertiary dark:text-dark-text-tertiary" />
+                    </div>
+                    <h3 className="text-base font-semibold text-text-primary dark:text-dark-text-primary">
+                      Nächste Termine
+                    </h3>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {events.slice(0, 3).map((event, index) => (
+                      <motion.div 
+                        key={event.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.6 + index * 0.05 }}
+                        className="flex items-center space-x-3 p-3 bg-surface-secondary dark:bg-dark-surface-secondary rounded-xl"
+                      >
+                        <div className={`w-8 h-8 ${event.color} rounded-xl flex items-center justify-center`}>
+                          <Icon name={getEventTypeIcon(event.type)} size={14} className="text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-text-primary dark:text-dark-text-primary truncate">
+                            {event.title}
+                          </p>
+                          <p className="text-xs text-text-secondary dark:text-dark-text-secondary">
+                            {formatTime(event.startTime)} - {formatTime(event.endTime)}
+                          </p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Add Event Modal */}
+      {showAddEvent && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <motion.div
+            className="bg-surface dark:bg-gray-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-text-primary dark:text-white">Add Schedule Event</h2>
+              <button
+                onClick={handleCloseModal}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
+              >
+                <Icon name="X" size={20} className="text-text-secondary dark:text-gray-400" />
+              </button>
+            </div>
+
+            <form onSubmit={(e) => { e.preventDefault(); handleAddEvent(); }} className="space-y-6">
+              {/* Event Title */}
+              <div>
+                <label className="block text-sm font-medium text-text-primary dark:text-white mb-2">
+                  Event Title *
+                </label>
+                <input
+                  type="text"
+                  value={newEvent.title}
+                  onChange={(e) => handleInputChange('title', e.target.value)}
+                  className={`w-full px-4 py-3 rounded-lg border ${formErrors.title ? 'border-red-500' : 'border-border dark:border-gray-600'} bg-background dark:bg-gray-700 text-text-primary dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent`}
+                  placeholder="Enter event title"
+                />
+                {formErrors.title && <p className="mt-1 text-sm text-red-600">{formErrors.title}</p>}
+              </div>
+
+              {/* Subject */}
+              <div>
+                <label className="block text-sm font-medium text-text-primary dark:text-white mb-2">
+                  Subject *
+                </label>
+                <input
+                  type="text"
+                  value={newEvent.subject}
+                  onChange={(e) => handleInputChange('subject', e.target.value)}
+                  className={`w-full px-4 py-3 rounded-lg border ${formErrors.subject ? 'border-red-500' : 'border-border dark:border-gray-600'} bg-background dark:bg-gray-700 text-text-primary dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent`}
+                  placeholder="Enter subject or course"
+                />
+                {formErrors.subject && <p className="mt-1 text-sm text-red-600">{formErrors.subject}</p>}
+              </div>
+
+              {/* Event Type */}
+              <div>
+                <label className="block text-sm font-medium text-text-primary dark:text-white mb-2">
+                  Event Type
+                </label>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {eventTypes.map((type) => (
+                    <button
+                      key={type.id}
+                      type="button"
+                      onClick={() => handleInputChange('type', type.id)}
+                      className={`p-3 rounded-lg border transition-colors duration-200 ${
+                        newEvent.type === type.id
+                          ? 'border-primary bg-primary-50 dark:bg-primary-900/20'
+                          : 'border-border dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                      }`}
+                    >
+                      <div className={`w-8 h-8 ${type.color} rounded-lg flex items-center justify-center mx-auto mb-2`}>
+                        <Icon name={type.icon} size={16} className="text-white" />
+                      </div>
+                      <span className="text-xs font-medium text-text-primary dark:text-white">
+                        {type.label}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Day and Time */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-text-primary dark:text-white mb-2">
+                    Day of Week
+                  </label>
+                  <select
+                    value={newEvent.day}
+                    onChange={(e) => handleInputChange('day', e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-text-primary dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent"
+                  >
+                    {daysOfWeek.map((day) => (
+                      <option key={day.id} value={day.id}>
+                        {day.fullName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-text-primary dark:text-white mb-2">
+                    Start Time *
+                  </label>
+                  <input
+                    type="time"
+                    value={newEvent.startTime}
+                    onChange={(e) => handleInputChange('startTime', e.target.value)}
+                    className={`w-full px-4 py-3 rounded-lg border ${formErrors.startTime ? 'border-red-500' : 'border-border dark:border-gray-600'} bg-background dark:bg-gray-700 text-text-primary dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent`}
+                  />
+                  {formErrors.startTime && <p className="mt-1 text-sm text-red-600">{formErrors.startTime}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-text-primary dark:text-white mb-2">
+                    End Time *
+                  </label>
+                  <input
+                    type="time"
+                    value={newEvent.endTime}
+                    onChange={(e) => handleInputChange('endTime', e.target.value)}
+                    className={`w-full px-4 py-3 rounded-lg border ${formErrors.endTime ? 'border-red-500' : 'border-border dark:border-gray-600'} bg-background dark:bg-gray-700 text-text-primary dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent`}
+                  />
+                  {formErrors.endTime && <p className="mt-1 text-sm text-red-600">{formErrors.endTime}</p>}
+                </div>
+              </div>
+
+              {/* Location */}
+              <div>
+                <label className="block text-sm font-medium text-text-primary dark:text-white mb-2">
+                  Location
+                </label>
+                <input
+                  type="text"
+                  value={newEvent.location}
+                  onChange={(e) => handleInputChange('location', e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-text-primary dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="Enter location (Home Office, Library, etc.)"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-text-primary dark:text-white mb-2">
+                  Description
+                </label>
+                <textarea
+                  value={newEvent.description}
+                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  rows={3}
+                  className="w-full px-4 py-3 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-text-primary dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+                  placeholder="Add description or notes (optional)"
+                />
+              </div>
+
+              {/* Priority and Recurring */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-text-primary dark:text-white mb-2">
+                    Priority
+                  </label>
+                  <select
+                    value={newEvent.priority}
+                    onChange={(e) => handleInputChange('priority', e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg border border-border dark:border-gray-600 bg-background dark:bg-gray-700 text-text-primary dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent"
+                  >
+                    {priorityOptions.map((priority) => (
+                      <option key={priority.id} value={priority.id}>
+                        {priority.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex items-center space-x-3 pt-8">
+                  <input
+                    type="checkbox"
+                    id="recurring"
+                    checked={newEvent.recurring}
+                    onChange={(e) => handleInputChange('recurring', e.target.checked)}
+                    className="w-5 h-5 text-primary bg-background dark:bg-gray-700 border-border dark:border-gray-600 rounded focus:ring-primary focus:ring-2"
+                  />
+                  <label htmlFor="recurring" className="text-sm font-medium text-text-primary dark:text-white">
+                    Recurring weekly event
+                  </label>
+                </div>
+              </div>
+
+              {/* Quick Time Templates */}
+              <div>
+                <label className="block text-sm font-medium text-text-primary dark:text-white mb-2">
+                  Quick Time Suggestions
+                </label>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  {[
+                    { label: '30 min', duration: 0.5 },
+                    { label: '1 hour', duration: 1 },
+                    { label: '1.5 hours', duration: 1.5 },
+                    { label: '2 hours', duration: 2 }
+                  ].map((template) => (
+                    <button
+                      key={template.label}
+                      type="button"
+                      onClick={() => {
+                        if (newEvent.startTime) {
+                          const [hours, minutes] = newEvent.startTime.split(':');
+                          const startDate = new Date();
+                          startDate.setHours(parseInt(hours), parseInt(minutes));
+                          const endDate = new Date(startDate.getTime() + template.duration * 60 * 60 * 1000);
+                          const endTime = `${String(endDate.getHours()).padStart(2, '0')}:${String(endDate.getMinutes()).padStart(2, '0')}`;
+                          handleInputChange('endTime', endTime);
+                        }
+                      }}
+                      className="px-3 py-2 text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors duration-200"
+                    >
+                      {template.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Form Actions */}
+              <div className="flex items-center justify-end space-x-4 pt-6">
+                <button
+                  type="button"
+                  onClick={handleCloseModal}
+                  className="px-6 py-3 text-text-secondary dark:text-gray-400 hover:text-text-primary dark:hover:text-white transition-colors duration-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-600 transition-colors duration-200 font-medium"
+                >
+                  Add to Schedule
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
+      </main>
+      
+      <BottomTabNavigation />
+      <NavigationBridge />
+      <StudySessionOverlay />
+    </div>
+  );
+};
+
+export default StudySchedule; 

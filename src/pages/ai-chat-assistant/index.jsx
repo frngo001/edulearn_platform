@@ -1,250 +1,654 @@
-import React, { useState, useEffect, useRef, useReducer } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import Icon from 'components/AppIcon';
-
 import ContextualHeader from 'components/ui/ContextualHeader';
 import BottomTabNavigation from 'components/ui/BottomTabNavigation';
-import StudySessionOverlay from 'components/ui/StudySessionOverlay';
 import NavigationBridge from 'components/ui/NavigationBridge';
+import StudySessionOverlay from 'components/ui/StudySessionOverlay';
+
+// Topic Selection Modal Component
+const TopicSelectionModal = ({ isOpen, onClose, onSelectTopic }) => {
+  const [selectedTopic, setSelectedTopic] = useState(null);
+  const [customTopic, setCustomTopic] = useState('');
+  const [showCustomInput, setShowCustomInput] = useState(false);
+
+  const predefinedTopics = [
+    {
+      id: 'programming',
+      title: 'Programming',
+      description: 'JavaScript, React, Python, Web Development',
+      icon: 'Code'
+    },
+    {
+      id: 'design',
+      title: 'Design & UI/UX',
+      description: 'Figma, Adobe, Prototyping, User Experience',
+      icon: 'Palette'
+    },
+    {
+      id: 'business',
+      title: 'Business & Marketing',
+      description: 'Strategy, Marketing, Entrepreneurship',
+      icon: 'TrendingUp'
+    },
+    {
+      id: 'science',
+      title: 'Science',
+      description: 'Mathematics, Physics, Chemistry, Biology',
+      icon: 'Atom'
+    },
+    {
+      id: 'language',
+      title: 'Languages',
+      description: 'German, English, French, Spanish',
+      icon: 'Globe'
+    },
+    {
+      id: 'general',
+      title: 'General',
+      description: 'General questions and conversation',
+      icon: 'MessageCircle'
+    }
+  ];
+
+  const handleTopicSelect = (topic) => {
+    setSelectedTopic(topic);
+    setShowCustomInput(false);
+    setCustomTopic('');
+  };
+
+  const handleCustomTopicSelect = () => {
+    setShowCustomInput(true);
+    setSelectedTopic(null);
+  };
+
+  const handleConfirm = () => {
+    if (selectedTopic) {
+      onSelectTopic(selectedTopic);
+    } else if (customTopic.trim()) {
+      onSelectTopic({
+        id: 'custom',
+        title: customTopic.trim(),
+        description: 'Custom topic',
+        icon: 'Star'
+      });
+    }
+    handleClose();
+  };
+
+  const handleClose = () => {
+    setSelectedTopic(null);
+    setCustomTopic('');
+    setShowCustomInput(false);
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+        onClick={handleClose}
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.9, y: 20 }}
+          transition={{ duration: 0.2 }}
+          className="bg-surface dark:bg-dark-surface rounded-3xl shadow-2xl border border-border dark:border-dark-border max-w-2xl w-full max-h-[90vh] overflow-hidden"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div className="p-6 border-b border-border dark:border-dark-border">
+            <div className="flex items-center justify-between">
+                             <div>
+                 <h2 className="text-xl font-semibold text-text-primary dark:text-dark-text-primary">
+                   Choose a topic
+                 </h2>
+                 <p className="text-sm text-text-secondary dark:text-dark-text-secondary mt-1">
+                   Start a new conversation about a specific topic
+                 </p>
+               </div>
+              <button
+                onClick={handleClose}
+                className="p-2 text-text-tertiary dark:text-dark-text-tertiary hover:text-text-primary dark:hover:text-dark-text-primary rounded-xl hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary transition-colors"
+              >
+                <Icon name="X" size={20} />
+              </button>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="p-6 max-h-[60vh] overflow-y-auto">
+            {/* Predefined Topics List */}
+            <div className="space-y-2 mb-6">
+              {predefinedTopics.map((topic, index) => (
+                <motion.button
+                  key={topic.id}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
+                  onClick={() => handleTopicSelect(topic)}
+                  className={`w-full p-3 rounded-xl text-left transition-all duration-200 group ${
+                    selectedTopic?.id === topic.id
+                      ? 'bg-surface-secondary dark:bg-dark-surface-secondary'
+                      : 'hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    {/* Topic Icon */}
+                    <div className="w-6 h-6 rounded-md bg-border dark:bg-dark-border flex items-center justify-center flex-shrink-0">
+                      <Icon 
+                        name={topic.icon} 
+                        size={12} 
+                        className="text-text-tertiary dark:text-dark-text-tertiary" 
+                      />
+                    </div>
+
+                    {/* Topic Content */}
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-medium text-text-primary dark:text-dark-text-primary truncate">
+                        {topic.title}
+                      </h4>
+                      <p className="text-xs text-text-tertiary dark:text-dark-text-tertiary truncate mt-0.5">
+                        {topic.description}
+                      </p>
+                    </div>
+
+                    {/* Selection Indicator */}
+                    {selectedTopic?.id === topic.id && (
+                      <div className="w-4 h-4 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                        <Icon name="Check" size={10} className="text-white" />
+                      </div>
+                    )}
+                  </div>
+                </motion.button>
+              ))}
+            </div>
+
+            {/* Custom Topic Option */}
+            <div className="border-t border-border dark:border-dark-border pt-4">
+              <motion.button
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+                onClick={handleCustomTopicSelect}
+                className={`w-full p-3 rounded-xl transition-all duration-200 text-left group ${
+                  showCustomInput
+                    ? 'bg-surface-secondary dark:bg-dark-surface-secondary'
+                    : 'hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary'
+                }`}
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-6 h-6 rounded-md bg-border dark:bg-dark-border flex items-center justify-center">
+                    <Icon name="Plus" size={12} className="text-text-tertiary dark:text-dark-text-tertiary" />
+                  </div>
+                                     <div className="flex-1">
+                     <h4 className="text-sm font-medium text-text-primary dark:text-dark-text-primary">
+                       Custom Topic
+                     </h4>
+                     <p className="text-xs text-text-tertiary dark:text-dark-text-tertiary mt-0.5">
+                       Create a custom topic
+                     </p>
+                   </div>
+                </div>
+              </motion.button>
+
+              {/* Custom Topic Input */}
+              <AnimatePresence>
+                {showCustomInput && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="mt-4"
+                  >
+                    <input
+                      type="text"
+                      value={customTopic}
+                      onChange={(e) => setCustomTopic(e.target.value)}
+                                             placeholder="e.g. Quantum Physics, Cooking Recipes, Photography..."
+                      className="w-full px-4 py-3 bg-surface-secondary dark:bg-dark-surface-secondary border border-border dark:border-dark-border rounded-xl text-text-primary dark:text-dark-text-primary placeholder-text-tertiary dark:placeholder-dark-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                      autoFocus
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="p-6 border-t border-border dark:border-dark-border bg-surface-secondary dark:bg-dark-surface-secondary">
+            <div className="flex items-center justify-between">
+                             <button
+                 onClick={handleClose}
+                 className="px-6 py-2.5 text-text-secondary dark:text-dark-text-secondary hover:text-text-primary dark:hover:text-dark-text-primary rounded-xl hover:bg-surface dark:hover:bg-dark-surface transition-colors font-medium"
+               >
+                 Cancel
+               </button>
+               <motion.button
+                 whileHover={{ scale: 1.02 }}
+                 whileTap={{ scale: 0.98 }}
+                 onClick={handleConfirm}
+                 disabled={!selectedTopic && !customTopic.trim()}
+                 className={`px-6 py-2.5 rounded-xl font-medium transition-all duration-200 ${
+                   selectedTopic || customTopic.trim()
+                     ? 'bg-primary text-white hover:bg-primary-600 shadow-md hover:shadow-lg'
+                     : 'bg-border dark:bg-dark-border text-text-tertiary dark:text-dark-text-tertiary cursor-not-allowed'
+                 }`}
+               >
+                 Start Chat
+               </motion.button>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
+// Recent Chats Dropdown Component
+const RecentChatsDropdown = ({ isOpen, onClose, chats, currentChatId, onSelectChat, onNewChat }) => {
+  if (!isOpen) return null;
+
+  // Get the 5 most recent chats
+  const recentChats = chats
+    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+    .slice(0, 5);
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+        transition={{ duration: 0.2 }}
+        className="absolute top-full right-0 mt-2 w-80 md:w-96 bg-surface dark:bg-dark-surface rounded-2xl border border-border dark:border-dark-border shadow-2xl z-50 overflow-hidden max-w-[calc(100vw-2rem)]"
+      >
+        {/* Header */}
+        <div className="p-4 border-b border-border dark:border-dark-border">
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-semibold text-text-primary dark:text-dark-text-primary">Recent chats</h3>
+            <button
+              onClick={onClose}
+              className="p-1.5 text-text-tertiary dark:text-dark-text-tertiary hover:text-text-primary dark:hover:text-dark-text-primary rounded-lg hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary transition-colors"
+            >
+              <Icon name="X" size={16} />
+            </button>
+          </div>
+        </div>
+
+        {/* New Chat Button */}
+        <div className="p-3 border-b border-border dark:border-dark-border">
+          <motion.button
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
+            onClick={() => {
+              onNewChat();
+              onClose();
+            }}
+            className="w-full bg-surface-secondary dark:bg-dark-surface-secondary text-text-primary dark:text-dark-text-primary rounded-xl px-4 py-3 text-sm font-medium hover:bg-border dark:hover:bg-dark-border transition-colors flex items-center justify-center space-x-2"
+          >
+            <Icon name="Plus" size={16} />
+            <span>New chat</span>
+          </motion.button>
+        </div>
+
+        {/* Recent Chats List */}
+        <div className="max-h-80 overflow-y-auto">
+          {recentChats.length > 0 ? (
+            <div className="p-2">
+              {recentChats.map((chat, index) => (
+                <motion.button
+                  key={chat.id}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  onClick={() => {
+                    onSelectChat(chat.id);
+                    onClose();
+                  }}
+                  className={`w-full p-3 rounded-xl text-left transition-all duration-200 group mb-1 ${
+                    currentChatId === chat.id
+                      ? 'bg-surface-secondary dark:bg-dark-surface-secondary'
+                      : 'hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    {/* Chat Icon */}
+                    <div className="w-6 h-6 rounded-md bg-border dark:bg-dark-border flex items-center justify-center flex-shrink-0">
+                      <Icon 
+                        name="MessageSquare" 
+                        size={12} 
+                        className="text-text-tertiary dark:text-dark-text-tertiary" 
+                      />
+                    </div>
+
+                    {/* Chat Content */}
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-medium text-text-primary dark:text-dark-text-primary truncate">
+                        {chat.title}
+                      </h4>
+                      <p className="text-xs text-text-tertiary dark:text-dark-text-tertiary truncate mt-0.5">
+                        {new Date(chat.timestamp).toLocaleDateString('de-DE', {
+                          month: 'short',
+                          day: 'numeric'
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                </motion.button>
+              ))}
+            </div>
+          ) : (
+            <div className="p-6 text-center">
+              <div className="w-12 h-12 bg-surface-secondary dark:bg-dark-surface-secondary rounded-full flex items-center justify-center mx-auto mb-3">
+                <Icon name="MessageSquare" size={20} className="text-text-tertiary dark:text-dark-text-tertiary" />
+              </div>
+              <h4 className="text-sm font-medium text-text-primary dark:text-dark-text-primary mb-1">Noch keine Unterhaltungen</h4>
+              <p className="text-xs text-text-tertiary dark:text-dark-text-tertiary">Starte deine erste Unterhaltung mit der KI</p>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        {recentChats.length > 0 && (
+          <div className="p-3 border-t border-border dark:border-dark-border bg-surface-secondary dark:bg-dark-surface-secondary">
+            <p className="text-xs text-text-tertiary dark:text-dark-text-tertiary text-center">
+              Alle Unterhaltungen ({chats.length})
+            </p>
+          </div>
+        )}
+      </motion.div>
+    </AnimatePresence>
+  );
+};
 
 const AiChatAssistant = () => {
   const navigate = useNavigate();
   const messagesEndRef = useRef(null);
-  const inputRef = useRef(null);
-  const [messages, setMessages] = useState([]);
-  const [inputMessage, setInputMessage] = useState('');
+  const textareaRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const chatContainerRef = useRef(null);
+  const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [showContextPanel, setShowContextPanel] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filteredMessages, setFilteredMessages] = useState([]);
-  const [showSearch, setShowSearch] = useState(false);
-  const [isVoiceRecording, setIsVoiceRecording] = useState(false);
-  const [attachedFile, setAttachedFile] = useState(null);
+  const [attachedFiles, setAttachedFiles] = useState([]);
+  const [showRecentChats, setShowRecentChats] = useState(false);
+  const [currentChatId, setCurrentChatId] = useState(1);
+  const [showTopicSelection, setShowTopicSelection] = useState(false);
+  const [showScrollToBottom, setShowScrollToBottom] = useState(false);
+  const [isUserScrolling, setIsUserScrolling] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Mock data for courses
-  const mockCourses = [
+      // Mock chats data
+  const [chats, setChats] = useState([
     {
       id: 1,
-      title: "Advanced React Development",
-      lesson: "React Hooks and State Management",
-      progress: 75,
-      color: "from-blue-500 to-purple-600"
+      title: 'React Hooks Explanation',
+      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+      messages: [
+        {
+          id: 1,
+          type: 'user',
+          content: 'hi',
+          timestamp: new Date()
+        },
+        {
+          id: 2,
+          type: 'assistant',
+          content: 'Hallo! Ich bin dein KI-Lernassistent. Ich kann dir bei deinen Studien helfen, Fragen beantworten und Lernmaterialien erklären. Womit kann ich dir heute helfen?',
+          timestamp: new Date()
+        },
+        {
+          id: 3,
+          type: 'user',
+          content: 'Can you explain useState hook?',
+          timestamp: new Date()
+        },
+        {
+          id: 4,
+          type: 'assistant',
+          content: 'Absolutely! The useState hook is one of the most fundamental hooks in React.\n\nHere\'s how it works:\n\n```javascript\nconst [state, setState] = useState(initialValue);\n```\n\n- `state` is the current value\n- `setState` is the function to update it\n- `initialValue` is the starting value\n\nExample:\n```javascript\nconst [count, setCount] = useState(0);\n```',
+          timestamp: new Date()
+        },
+        {
+          id: 5,
+          type: 'user',
+          content: 'What about useEffect?',
+          timestamp: new Date()
+        },
+        {
+          id: 6,
+          type: 'assistant',
+          content: 'Great question! useEffect is used for side effects in functional components.\n\nBasic syntax:\n```javascript\nuseEffect(() => {\n  // Side effect code\n}, [dependencies]);\n```\n\nCommon use cases:\n- API calls\n- Setting up subscriptions\n- Manually changing the DOM\n- Cleanup operations\n\nThe dependency array controls when the effect runs.',
+          timestamp: new Date()
+        },
+        {
+          id: 7,
+          type: 'user',
+          content: 'Can you show me a practical example?',
+          timestamp: new Date()
+        },
+        {
+          id: 8,
+          type: 'assistant',
+          content: 'Sure! Here\'s a practical example of a component that fetches user data:\n\n```javascript\nimport React, { useState, useEffect } from \'react\';\n\nfunction UserProfile({ userId }) {\n  const [user, setUser] = useState(null);\n  const [loading, setLoading] = useState(true);\n  const [error, setError] = useState(null);\n\n  useEffect(() => {\n    const fetchUser = async () => {\n      try {\n        setLoading(true);\n        const response = await fetch(`/api/users/${userId}`);\n        const userData = await response.json();\n        setUser(userData);\n      } catch (err) {\n        setError(err.message);\n      } finally {\n        setLoading(false);\n      }\n    };\n\n    fetchUser();\n  }, [userId]); // Re-run when userId changes\n\n  if (loading) return <div>Loading...</div>;\n  if (error) return <div>Error: {error}</div>;\n  if (!user) return <div>No user found</div>;\n\n  return (\n    <div>\n      <h1>{user.name}</h1>\n      <p>{user.email}</p>\n    </div>\n  );\n}\n```\n\nThis example shows:\n- State management with useState\n- Side effects with useEffect\n- Dependency array [userId]\n- Loading and error states\n- Async operations',
+          timestamp: new Date()
+        }
+      ]
     },
     {
       id: 2,
-      title: "Data Structures & Algorithms",
-      lesson: "Binary Trees and Graph Traversal",
-      progress: 60,
-      color: "from-green-500 to-teal-600"
+      title: 'JavaScript Fundamentals',
+      timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+      messages: []
     },
     {
       id: 3,
-      title: "Machine Learning Fundamentals",
-      lesson: "Neural Networks Introduction",
-      progress: 45,
-      color: "from-orange-500 to-red-600"
+      title: 'CSS Grid Layout',
+      timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+      messages: []
     }
-  ];
+  ]);
 
-  // Mock chat messages
-  const mockMessages = [
-    {
-      id: 1,
-      type: 'ai',
-      content: `Hello! I'm your AI learning assistant. I'm here to help you understand complex concepts, answer questions, and provide personalized learning support.
+  // Get current chat messages
+  const currentChat = chats.find(chat => chat.id === currentChatId);
+  const [messages, setMessages] = useState(currentChat?.messages || []);
 
-How can I assist you with your studies today?`,
-      timestamp: new Date(Date.now() - 3600000),
-      course: 'Advanced React Development',
-      hasCode: false
-    },
-    {
-      id: 2,
-      type: 'user',
-      content: "Can you explain the difference between useState and useReducer hooks in React?",
-      timestamp: new Date(Date.now() - 3500000)
-    },
-    {
-      id: 3,
-      type: 'ai',
-      content: `Great question! Let me explain the key differences between useState and useReducer:
-
-**useState** is perfect for simple state management:
-- Best for primitive values (strings, numbers, booleans)
-- Simple state updates
-- When you have independent state variables
-
-**useReducer** is better for complex state logic:
-- Managing objects with multiple sub-values
-- When state transitions depend on previous state
-- Complex state logic that involves multiple sub-values
-
-Here's a practical example:`,timestamp: new Date(Date.now() - 3400000),course: 'Advanced React Development',
-      hasCode: true,
-      codeExample: `// useState example
-const [count, setCount] = useState(0);
-const [name, setName] = useState('');
-
-// useReducer example
-const initialState = { count: 0, name: '', loading: false };
-
-function reducer(state, action) {
-  switch (action.type) {
-    case 'increment':
-      return { ...state, count: state.count + 1 };
-    case 'setName':
-      return { ...state, name: action.payload };
-    case 'setLoading':
-      return { ...state, loading: action.payload };
-    default:
-      return state;
-  }
-}
-
-const [state, dispatch] = useReducer(reducer, initialState);`
-    },
-    {
-      id: 4,
-      type: 'user',
-      content: "That\'s helpful! Can you create some practice questions about React hooks?",
-      timestamp: new Date(Date.now() - 3200000)
-    },
-    {
-      id: 5,
-      type: 'ai',
-      content: `Absolutely! Here are some practice questions to test your understanding of React hooks:
-
-**Beginner Level:**
-1. What is the purpose of the dependency array in useEffect?
-2. When would you use useState vs useReducer?
-3. What happens if you forget to include a dependency in useEffect?
-
-**Intermediate Level:**
-4. How would you implement a custom hook for API data fetching?
-5. Explain the difference between useCallback and useMemo
-6. What are the rules of hooks and why are they important?
-
-**Advanced Level:**
-7. How would you optimize a component that re-renders frequently due to prop changes?
-8. Implement a custom hook that manages localStorage state
-9. Explain how useRef differs from useState for storing values
-
-Would you like me to provide detailed answers for any of these questions?`,
-      timestamp: new Date(Date.now() - 3000000),
-      course: 'Advanced React Development',
-      hasCode: false
-    }
-  ];
-
-  // Quick suggestion chips
-  const quickSuggestions = [
-    { text: "Explain this concept", icon: "BookOpen" },
-    { text: "Create practice questions", icon: "HelpCircle" },
-    { text: "Summarize this lesson", icon: "FileText" },
-    { text: "Show examples", icon: "Code" },
-    { text: "Test my knowledge", icon: "Brain" },
-    { text: "Related topics", icon: "Link" }
-  ];
-
+  // Check if mobile on mount and resize
   useEffect(() => {
-    setMessages(mockMessages);
-    setSelectedCourse(mockCourses[0]);
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  useEffect(() => {
-    if (searchQuery) {
-      const filtered = messages.filter(message =>
-        message.content.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredMessages(filtered);
-    } else {
-      setFilteredMessages(messages);
-    }
-  }, [searchQuery, messages]);
-
   const scrollToBottom = () => {
+    // Scroll to the very bottom of the container
+    const container = chatContainerRef.current;
+    if (container) {
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+    // Also use the ref as backup
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    setShowScrollToBottom(false);
+    setIsUserScrolling(false);
   };
 
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim() && !attachedFile) return;
+  const handleScroll = () => {
+    const container = chatContainerRef.current;
+    if (!container) return;
 
-    const newMessage = {
-      id: messages.length + 1,
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    const isAtBottom = scrollHeight - scrollTop - clientHeight < 50; // Reduced threshold for better detection
+    
+    // Show scroll to bottom button if not at bottom and has enough messages
+    const shouldShow = !isAtBottom && messages.length > 2;
+    setShowScrollToBottom(shouldShow);
+    
+    // Track if user is manually scrolling
+    if (!isAtBottom) {
+      setIsUserScrolling(true);
+    } else {
+      setIsUserScrolling(false);
+    }
+  };
+
+  useEffect(() => {
+    // Only auto-scroll if user is not manually scrolling
+    if (!isUserScrolling) {
+      scrollToBottom();
+    }
+  }, [messages, isUserScrolling]);
+
+  useEffect(() => {
+    const container = chatContainerRef.current;
+    if (container) {
+      container.addEventListener('scroll', handleScroll, { passive: true });
+      // Initial check
+      handleScroll();
+      return () => container.removeEventListener('scroll', handleScroll);
+    }
+  }, [messages]);
+
+  // Force check scroll position when messages change
+  useEffect(() => {
+    setTimeout(() => {
+      handleScroll();
+    }, 100);
+  }, [messages]);
+
+  const handleSendMessage = async (e) => {
+    e.preventDefault();
+    
+    if (!input.trim() && attachedFiles.length === 0) return;
+
+    const userMessage = {
+      id: Date.now(),
       type: 'user',
-      content: inputMessage,
+      content: input.trim(),
       timestamp: new Date(),
-      attachment: attachedFile
+      attachments: attachedFiles.length > 0 ? [...attachedFiles] : null
     };
 
-    setMessages(prev => [...prev, newMessage]);
-    setInputMessage('');
-    setAttachedFile(null);
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
+    updateCurrentChat(newMessages);
+    setInput('');
+    setAttachedFiles([]);
     setIsTyping(true);
+    setIsUserScrolling(false); // Reset scrolling state when sending message
 
-    // Simulate AI response
+    // Simulate AI response delay
     setTimeout(() => {
       const aiResponse = {
-        id: messages.length + 2,
-        type: 'ai',
-        content: `I understand your question about "${inputMessage}". Let me provide you with a comprehensive explanation.
-
-This is a great topic that many students find challenging. Based on your current course progress in ${selectedCourse?.title}, I can see you're working on advanced concepts.Here's what you need to know:
-• Key concept explanation with practical examples
-• Step-by-step breakdown of the process
-• Common pitfalls to avoid
-• Best practices and recommendations
-
-Would you like me to elaborate on any specific aspect or provide additional practice exercises?`,
-        timestamp: new Date(),
-        course: selectedCourse?.title,
-        hasCode: Math.random() > 0.5
+        id: Date.now() + 1,
+        type: 'assistant',
+        content: 'I\'m here to help! How can I assist you today?',
+        timestamp: new Date()
       };
-
-      setMessages(prev => [...prev, aiResponse]);
+      const finalMessages = [...newMessages, aiResponse];
+      setMessages(finalMessages);
+      updateCurrentChat(finalMessages);
       setIsTyping(false);
-    }, 2000);
+    }, 1500);
+  };
+
+  const updateCurrentChat = (newMessages) => {
+    setChats(prev => prev.map(chat => 
+      chat.id === currentChatId 
+        ? { ...chat, messages: newMessages, timestamp: new Date().toISOString() }
+        : chat
+    ));
+  };
+
+  const handleSelectChat = (chatId) => {
+    const selectedChat = chats.find(chat => chat.id === chatId);
+    if (selectedChat) {
+      setCurrentChatId(chatId);
+      setMessages(selectedChat.messages || []);
+      setIsUserScrolling(false); // Reset scroll state when switching chats
+      setShowScrollToBottom(false);
+    }
+  };
+
+  const handleNewChat = () => {
+    setShowTopicSelection(true);
+  };
+
+  const handleTopicSelect = (topic) => {
+    const newChatId = Date.now();
+    const newChat = {
+      id: newChatId,
+      title: topic.title,
+      topic: topic,
+      timestamp: new Date().toISOString(),
+      messages: []
+    };
+    
+    setChats(prev => [newChat, ...prev]);
+    setCurrentChatId(newChatId);
+    setMessages([]);
+    setShowTopicSelection(false);
+    setIsUserScrolling(false); // Reset scroll state for new chat
+    setShowScrollToBottom(false);
   };
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      handleSendMessage(e);
     }
   };
 
-  const handleQuickSuggestion = (suggestion) => {
-    setInputMessage(suggestion.text);
-    inputRef.current?.focus();
+  const handleFileUpload = (e) => {
+    const files = Array.from(e.target.files);
+    setAttachedFiles(prev => [...prev, ...files]);
+    e.target.value = ''; // Reset input
   };
 
-  const handleVoiceToggle = () => {
-    setIsVoiceRecording(!isVoiceRecording);
-    // Voice recording logic would go here
+  const removeFile = (index) => {
+    setAttachedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleFileAttachment = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setAttachedFile({
-        name: file.name,
-        size: file.size,
-        type: file.type
-      });
+  const handleCopyMessage = async (content) => {
+    try {
+      await navigator.clipboard.writeText(content);
+      // Could add a toast notification here
+    } catch (err) {
+      console.error('Failed to copy message:', err);
     }
   };
 
-  const formatTime = (date) => {
-    return new Intl.DateTimeFormat('en-US', {
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(date);
+  const handleBookmarkMessage = (message) => {
+    // Implementation for bookmarking
+    console.log('Bookmarked message:', message);
+    // Could save to localStorage or send to backend
   };
+
+  const adjustTextareaHeight = () => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+    }
+  };
+
+  useEffect(() => {
+    adjustTextareaHeight();
+  }, [input]);
 
   const formatFileSize = (bytes) => {
     if (bytes === 0) return '0 Bytes';
@@ -254,324 +658,304 @@ Would you like me to elaborate on any specific aspect or provide additional prac
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  const displayMessages = showSearch ? filteredMessages : messages;
+  const truncateFileName = (fileName, maxLength = 25) => {
+    if (fileName.length <= maxLength) return fileName;
+    
+    // Finde die Dateiendung
+    const lastDotIndex = fileName.lastIndexOf('.');
+    const extension = lastDotIndex !== -1 ? fileName.substring(lastDotIndex) : '';
+    const nameWithoutExtension = lastDotIndex !== -1 ? fileName.substring(0, lastDotIndex) : fileName;
+    
+    // Berechne verfügbare Zeichen für den Namen (minus Extension und "...")
+    const availableLength = maxLength - extension.length - 3; // 3 für "..."
+    
+    if (availableLength <= 0) {
+      // Wenn sogar die Extension zu lang ist, zeige nur die ersten Zeichen
+      return fileName.substring(0, maxLength - 3) + '...';
+    }
+    
+    // Teile die verfügbaren Zeichen zwischen Anfang und Ende auf
+    const startLength = Math.ceil(availableLength / 2);
+    const endLength = Math.floor(availableLength / 2);
+    
+    const start = nameWithoutExtension.substring(0, startLength);
+    const end = nameWithoutExtension.substring(nameWithoutExtension.length - endLength);
+    
+    return start + '...' + end + extension;
+  };
 
   return (
-    <div className="min-h-screen bg-background">
-      <ContextualHeader />
-      <NavigationBridge />
-      
-      <div className="pt-16 pb-20 md:pb-4 md:pl-64">
-        <div className="h-screen flex flex-col">
-          {/* Context Panel */}
-          {showContextPanel && selectedCourse && (
-            <div className="bg-gradient-to-r from-primary-50 to-secondary-50 border-b border-border p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className={`w-10 h-10 bg-gradient-to-r ${selectedCourse.color} rounded-lg flex items-center justify-center`}>
-                    <Icon name="BookOpen" size={20} className="text-white" />
+    <div className="min-h-screen bg-background dark:bg-dark-background">
+      <ContextualHeader 
+        showRecentChats={showRecentChats}
+        setShowRecentChats={setShowRecentChats}
+        chats={chats}
+        currentChatId={currentChatId}
+        onSelectChat={handleSelectChat}
+        onNewChat={handleNewChat}
+        RecentChatsDropdown={RecentChatsDropdown}
+      />
+
+      <main className="pt-16 pb-20 md:pb-4 md:pl-16">
+        {/* Chat Messages - optimiert für perfektes Scrollen */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className="h-[calc(100vh-4rem)] md:h-[calc(100vh-4rem)] bg-surface dark:bg-dark-surface overflow-hidden"
+        >
+          <div 
+            ref={chatContainerRef}
+            className="h-full overflow-y-auto px-4 py-4 space-y-4"
+            style={{ paddingBottom: isMobile ? '200px' : '140px' }}
+          >
+            {/* Welcome Message for New Chats */}
+            {messages.length === 0 && currentChat?.topic && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="flex justify-center items-center min-h-[50vh]"
+              >
+                <div className="text-center max-w-md">
+                  <div className="w-16 h-16 rounded-2xl bg-surface-secondary dark:bg-dark-surface-secondary border border-border dark:border-dark-border flex items-center justify-center mx-auto mb-4">
+                    <Icon name={currentChat.topic.icon} size={32} className="text-text-secondary dark:text-dark-text-secondary" />
                   </div>
-                  <div>
-                    <h3 className="font-heading font-semibold text-text-primary">
-                      {selectedCourse.title}
-                    </h3>
-                    <p className="text-sm text-text-secondary">
-                      Current: {selectedCourse.lesson}
-                    </p>
+                  <h2 className="text-xl font-semibold text-text-primary dark:text-dark-text-primary mb-2">
+                    {currentChat.topic.title}
+                  </h2>
+                  <p className="text-text-secondary dark:text-dark-text-secondary mb-6">
+                    {currentChat.topic.description}
+                  </p>
+                  <div className="bg-surface-secondary dark:bg-dark-surface-secondary rounded-2xl p-4 text-left border border-border/30 dark:border-dark-border/30">
+                                         <p className="text-sm text-text-tertiary dark:text-dark-text-tertiary">
+                       💡 <strong>Tip:</strong> Ask specific questions about this topic for the best answers!
+                     </p>
                   </div>
                 </div>
-                <button
-                  onClick={() => setShowContextPanel(false)}
-                  className="p-2 rounded-lg hover:bg-white hover:bg-opacity-50 transition-colors duration-150"
-                >
-                  <Icon name="X" size={20} className="text-text-secondary" />
-                </button>
-              </div>
-              <div className="mt-3">
-                <div className="flex items-center justify-between text-sm text-text-secondary mb-1">
-                  <span>Progress</span>
-                  <span>{selectedCourse.progress}%</span>
-                </div>
-                <div className="w-full bg-white bg-opacity-50 rounded-full h-2">
-                  <div 
-                    className={`bg-gradient-to-r ${selectedCourse.color} h-2 rounded-full transition-all duration-300`}
-                    style={{ width: `${selectedCourse.progress}%` }}
-                  ></div>
-                </div>
-              </div>
-            </div>
-          )}
+              </motion.div>
+            )}
 
-          {/* Search Bar */}
-          {showSearch && (
-            <div className="bg-surface border-b border-border p-4">
-              <div className="relative">
-                <Icon name="Search" size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-tertiary" />
-                <input
-                  type="text"
-                  placeholder="Search conversation history..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-10 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary transition-colors duration-200"
-                />
-                <button
-                  onClick={() => {
-                    setShowSearch(false);
-                    setSearchQuery('');
-                  }}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-tertiary hover:text-text-secondary"
-                >
-                  <Icon name="X" size={16} />
-                </button>
-              </div>
-              {searchQuery && (
-                <p className="text-sm text-text-secondary mt-2">
-                  Found {filteredMessages.length} message(s)
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* Chat Header */}
-          <div className="bg-surface border-b border-border p-4 flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-secondary to-primary rounded-full flex items-center justify-center">
-                <Icon name="Bot" size={20} className="text-white" />
-              </div>
-              <div>
-                <h2 className="font-heading font-semibold text-text-primary">AI Learning Assistant</h2>
-                <p className="text-sm text-text-secondary">
-                  {isTyping ? 'Typing...' : 'Online • Ready to help'}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => setShowContextPanel(!showContextPanel)}
-                className={`p-2 rounded-lg transition-colors duration-150 ${
-                  showContextPanel 
-                    ? 'bg-primary-100 text-primary-700' :'hover:bg-gray-100 text-text-secondary'
-                }`}
-                aria-label="Toggle context panel"
-              >
-                <Icon name="Info" size={20} />
-              </button>
-              <button
-                onClick={() => setShowSearch(!showSearch)}
-                className={`p-2 rounded-lg transition-colors duration-150 ${
-                  showSearch 
-                    ? 'bg-primary-100 text-primary-700' :'hover:bg-gray-100 text-text-secondary'
-                }`}
-                aria-label="Search messages"
-              >
-                <Icon name="Search" size={20} />
-              </button>
-              <button
-                onClick={() => navigate('/dashboard')}
-                className="p-2 rounded-lg hover:bg-gray-100 text-text-secondary transition-colors duration-150"
-                aria-label="Exit chat"
-              >
-                <Icon name="X" size={20} />
-              </button>
-            </div>
-          </div>
-
-          {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {displayMessages.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Icon name="MessageSquare" size={24} className="text-white" />
-                </div>
-                <h3 className="text-lg font-heading font-semibold text-text-primary mb-2">
-                  {searchQuery ? 'No messages found' : 'Start a conversation'}
-                </h3>
-                <p className="text-text-secondary">
-                  {searchQuery 
-                    ? 'Try adjusting your search terms' :'Ask me anything about your courses or learning topics'
-                  }
-                </p>
-              </div>
-            ) : (
-              displayMessages.map((message) => (
-                <div
+            <AnimatePresence>
+              {messages.map((message, index) => (
+                <motion.div
                   key={message.id}
-                  className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'} group`}
                 >
-                  <div className={`max-w-xs md:max-w-md lg:max-w-lg ${message.type === 'user' ? 'order-2' : 'order-1'}`}>
+                  <div className={`max-w-[85%] ${message.type === 'user' ? 'order-2' : 'order-1'}`}>
+                    {/* File Attachments */}
+                    {message.attachments && message.attachments.length > 0 && (
+                      <div className="mb-2 space-y-1">
+                        {message.attachments.map((file, fileIndex) => (
+                          <div key={fileIndex} className="flex items-center space-x-2 bg-surface-secondary dark:bg-dark-surface-secondary rounded-lg px-3 py-2 text-sm">
+                            <Icon name="Paperclip" size={14} className="text-text-tertiary dark:text-dark-text-tertiary" />
+                            <span className="text-text-primary dark:text-dark-text-primary font-medium" title={file.name}>
+                              {isMobile ? truncateFileName(file.name, 20) : file.name}
+                            </span>
+                            <span className="text-text-tertiary dark:text-dark-text-tertiary text-xs">
+                              ({formatFileSize(file.size)})
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
                     <div
                       className={`rounded-2xl px-4 py-3 ${
-                        message.type === 'user' ?'bg-primary text-white' :'bg-surface border border-border'
+                        message.type === 'user'
+                          ? 'bg-primary text-white ml-auto'
+                          : 'bg-surface-secondary dark:bg-dark-surface-secondary text-text-primary dark:text-dark-text-primary'
                       }`}
                     >
-                      {message.attachment && (
-                        <div className="mb-3 p-3 bg-white bg-opacity-20 rounded-lg">
-                          <div className="flex items-center space-x-2">
-                            <Icon name="Paperclip" size={16} className="text-current opacity-70" />
-                            <span className="text-sm font-medium">{message.attachment.name}</span>
-                          </div>
-                        </div>
-                      )}
-                      
-                      <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap">
                         {message.content}
+                      </p>
+                    </div>
+
+                    {/* Message Actions - Only for Assistant Messages */}
+                    {message.type === 'assistant' && (
+                      <div className="flex items-center space-x-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={() => handleCopyMessage(message.content)}
+                          className="p-2 text-text-tertiary dark:text-dark-text-tertiary hover:text-text-primary dark:hover:text-dark-text-primary rounded-lg hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary transition-colors"
+                          title="Copy"
+                        >
+                          <Icon name="Copy" size={14} />
+                        </button>
+                        <button
+                          onClick={() => handleBookmarkMessage(message)}
+                          className="p-2 text-text-tertiary dark:text-dark-text-tertiary hover:text-accent dark:hover:text-accent rounded-lg hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary transition-colors"
+                          title="Add to bookmarks"
+                        >
+                          <Icon name="Bookmark" size={14} />
+                        </button>
                       </div>
-
-                      {message.hasCode && message.codeExample && (
-                        <div className="mt-3 bg-gray-900 rounded-lg p-3 overflow-x-auto">
-                          <pre className="text-sm text-gray-100">
-                            <code>{message.codeExample}</code>
-                          </pre>
-                        </div>
-                      )}
-
-                      {message.course && (
-                        <div className="mt-2 text-xs opacity-70">
-                          Related to: {message.course}
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className={`flex items-center mt-1 space-x-2 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                      <span className="text-xs text-text-tertiary">
-                        {formatTime(message.timestamp)}
-                      </span>
-                      {message.type === 'ai' && (
-                        <div className="flex space-x-1">
-                          <button className="p-1 rounded hover:bg-gray-100 transition-colors duration-150">
-                            <Icon name="Copy" size={12} className="text-text-tertiary" />
-                          </button>
-                          <button className="p-1 rounded hover:bg-gray-100 transition-colors duration-150">
-                            <Icon name="Bookmark" size={12} className="text-text-tertiary" />
-                          </button>
-                        </div>
-                      )}
-                    </div>
+                    )}
                   </div>
-                  
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    message.type === 'user' ?'order-1 mr-3 bg-gradient-to-br from-accent to-warning' :'order-2 ml-3 bg-gradient-to-br from-secondary to-primary'
-                  }`}>
-                    <Icon 
-                      name={message.type === 'user' ? 'User' : 'Bot'} 
-                      size={16} 
-                      className="text-white" 
-                    />
-                  </div>
-                </div>
-              ))
-            )}
+                </motion.div>
+              ))}
+            </AnimatePresence>
 
             {isTyping && (
-              <div className="flex justify-start">
-                <div className="max-w-xs">
-                  <div className="bg-surface border border-border rounded-2xl px-4 py-3">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex justify-start"
+              >
+                <div className="max-w-[85%]">
+                  <div className="bg-surface-secondary dark:bg-dark-surface-secondary rounded-2xl px-4 py-3">
                     <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-text-tertiary rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-text-tertiary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                      <div className="w-2 h-2 bg-text-tertiary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      <div className="w-2 h-2 bg-text-tertiary dark:bg-dark-text-tertiary rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-text-tertiary dark:bg-dark-text-tertiary rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                      <div className="w-2 h-2 bg-text-tertiary dark:bg-dark-text-tertiary rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                     </div>
                   </div>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-secondary to-primary flex items-center justify-center flex-shrink-0 ml-3">
-                  <Icon name="Bot" size={16} className="text-white" />
-                </div>
-              </div>
+              </motion.div>
             )}
-
+            
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Quick Suggestions */}
-          {messages.length <= 1 && (
-            <div className="px-4 py-2 border-t border-border bg-surface">
-              <div className="flex flex-wrap gap-2">
-                {quickSuggestions.map((suggestion, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleQuickSuggestion(suggestion)}
-                    className="flex items-center space-x-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-text-secondary hover:text-text-primary transition-colors duration-150"
-                  >
-                    <Icon name={suggestion.icon} size={14} />
-                    <span>{suggestion.text}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Input Area */}
-          <div className="bg-surface border-t border-border p-4">
-            {attachedFile && (
-              <div className="mb-3 p-3 bg-gray-50 rounded-lg flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Icon name="Paperclip" size={16} className="text-text-tertiary" />
-                  <span className="text-sm text-text-primary">{attachedFile.name}</span>
-                  <span className="text-xs text-text-tertiary">({formatFileSize(attachedFile.size)})</span>
-                </div>
-                <button
-                  onClick={() => setAttachedFile(null)}
-                  className="p-1 rounded hover:bg-gray-200 transition-colors duration-150"
-                >
-                  <Icon name="X" size={14} className="text-text-tertiary" />
-                </button>
-              </div>
-            )}
-
-            <div className="flex items-end space-x-3">
-              <div className="flex-1">
-                <div className="relative">
-                  <textarea
-                    ref={inputRef}
-                    value={inputMessage}
-                    onChange={(e) => setInputMessage(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="Ask me anything about your courses..."
-                    className="w-full px-4 py-3 pr-12 border border-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary transition-colors duration-200 resize-none max-h-32"
-                    rows="1"
-                    style={{ minHeight: '48px' }}
-                  />
-                  <div className="absolute right-3 bottom-3 flex items-center space-x-1">
-                    <input
-                      type="file"
-                      id="file-upload"
-                      className="hidden"
-                      onChange={handleFileAttachment}
-                      accept="image/*,.pdf,.doc,.docx,.txt"
-                    />
-                    <label
-                      htmlFor="file-upload"
-                      className="p-1 rounded hover:bg-gray-100 cursor-pointer transition-colors duration-150"
-                    >
-                      <Icon name="Paperclip" size={16} className="text-text-tertiary" />
-                    </label>
-                    <button
-                      onClick={handleVoiceToggle}
-                      className={`p-1 rounded transition-colors duration-150 ${
-                        isVoiceRecording 
-                          ? 'bg-error text-white' :'hover:bg-gray-100 text-text-tertiary'
-                      }`}
-                    >
-                      <Icon name={isVoiceRecording ? 'MicOff' : 'Mic'} size={16} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-              
-              <button
-                onClick={handleSendMessage}
-                disabled={!inputMessage.trim() && !attachedFile}
-                className="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 active:scale-95"
+          {/* Scroll to Bottom Button */}
+          <AnimatePresence>
+            {showScrollToBottom && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.8, y: 20 }}
+                transition={{ duration: 0.2 }}
+                onClick={scrollToBottom}
+                className="absolute bottom-32 right-6 w-12 h-12 bg-primary text-white rounded-full shadow-lg hover:shadow-xl flex items-center justify-center transition-all duration-200 hover:scale-105 z-20"
+                aria-label="Scroll to bottom"
               >
-                <Icon name="Send" size={20} />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+                <Icon name="ArrowDown" size={20} className="text-white" />
+              </motion.button>
+            )}
+          </AnimatePresence>
 
-      <BottomTabNavigation />
+
+        </motion.div>
+
+        {/* Input Area - Schönes Design ohne Trennlinie */}
+        <div className="fixed bottom-0 left-0 right-0 md:left-16 bg-gradient-to-t from-surface dark:from-dark-surface via-surface dark:via-dark-surface to-transparent pt-6 pb-4 px-4 z-10">
+          {/* File Attachments Preview */}
+          <AnimatePresence>
+            {attachedFiles.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mb-4 space-y-2"
+              >
+                {attachedFiles.map((file, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    className="flex items-center justify-between bg-surface-secondary dark:bg-dark-surface-secondary rounded-xl px-3 py-2 shadow-sm border border-border/30 dark:border-dark-border/30"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <div className="w-8 h-8 bg-primary/10 dark:bg-primary/20 rounded-lg flex items-center justify-center">
+                        <Icon name="Paperclip" size={14} className="text-primary dark:text-primary" />
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-text-primary dark:text-dark-text-primary font-medium text-sm" title={file.name}>
+                          {isMobile ? truncateFileName(file.name, 18) : file.name}
+                        </span>
+                        <span className="text-text-tertiary dark:text-dark-text-tertiary text-xs">
+                          {formatFileSize(file.size)}
+                        </span>
+                      </div>
+                    </div>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => removeFile(index)}
+                      className="w-6 h-6 bg-error/10 dark:bg-error/20 hover:bg-error/20 dark:hover:bg-error/30 text-error rounded-full flex items-center justify-center transition-colors"
+                    >
+                      <Icon name="X" size={12} />
+                    </motion.button>
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Main Input Container */}
+          <div className="bg-surface-secondary dark:bg-dark-surface-secondary rounded-3xl shadow-lg border border-border/20 dark:border-dark-border/20 p-1">
+            <form onSubmit={handleSendMessage} className="flex items-end">
+              {/* File Upload Button */}
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="w-10 h-10 text-text-secondary dark:text-dark-text-secondary hover:text-primary dark:hover:text-primary rounded-2xl hover:bg-surface dark:hover:bg-dark-surface transition-all duration-200 flex items-center justify-center flex-shrink-0 ml-1"
+              >
+                <Icon name="Paperclip" size={18} />
+              </motion.button>
+
+              {/* Text Input */}
+              <div className="flex-1 px-2">
+                <textarea
+                  ref={textareaRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Ask me anything..."
+                  className="w-full bg-transparent text-text-primary dark:text-dark-text-primary placeholder-text-tertiary dark:placeholder-dark-text-tertiary resize-none border-none outline-none focus:outline-none focus:ring-0 focus:border-none py-3 text-sm leading-relaxed min-h-[44px] max-h-[120px] overflow-y-auto"
+                  style={{ 
+                    scrollbarWidth: 'thin',
+                    scrollbarColor: 'rgba(156, 163, 175, 0.3) transparent',
+                    boxShadow: 'none'
+                  }}
+                />
+              </div>
+
+              {/* Send Button */}
+              <motion.button
+                whileHover={{ scale: input.trim() || attachedFiles.length > 0 ? 1.05 : 1 }}
+                whileTap={{ scale: input.trim() || attachedFiles.length > 0 ? 0.95 : 1 }}
+                type="submit"
+                disabled={!input.trim() && attachedFiles.length === 0}
+                className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-200 flex-shrink-0 mr-1 ${
+                  input.trim() || attachedFiles.length > 0
+                    ? 'bg-primary text-white shadow-md hover:shadow-lg hover:bg-primary-600'
+                    : 'bg-border/50 dark:bg-dark-border/50 text-text-tertiary dark:text-dark-text-tertiary cursor-not-allowed'
+                }`}
+              >
+                <Icon name="ArrowUp" size={16} />
+              </motion.button>
+            </form>
+          </div>
+
+          {/* Hidden File Input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            onChange={handleFileUpload}
+            className="hidden"
+            accept=".txt,.pdf,.doc,.docx,.png,.jpg,.jpeg,.gif,.mp4,.mov"
+          />
+        </div>
+      </main>
+
+      <NavigationBridge />
       <StudySessionOverlay />
+      <BottomTabNavigation />
+
+      {/* Topic Selection Modal */}
+      <TopicSelectionModal
+        isOpen={showTopicSelection}
+        onClose={() => setShowTopicSelection(false)}
+        onSelectTopic={handleTopicSelect}
+      />
     </div>
   );
 };
